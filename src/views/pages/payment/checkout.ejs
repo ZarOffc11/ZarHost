@@ -46,14 +46,9 @@
       </div>
 
       <% if (trx.type === 'new' && trx.domain && serverIp) { %>
-        <div class="rounded-xl bg-primary/10 border border-primary/40 p-4 text-xs text-ink2 leading-relaxed">
-          <div class="font-display font-semibold text-primary2 mb-2"><i class="fa-solid fa-circle-info"></i> Sambil menunggu pembayaran, arahkan domain Anda</div>
-          <p class="mb-2">Login ke panel DNS registrar domain <span class="text-ink font-mono"><%= trx.domain %></span> Anda lalu set <b>A Record</b>:</p>
-          <div class="rounded-lg bg-bg/60 border border-border p-2 font-mono text-[11px] text-ink space-y-1">
-            <div>A &nbsp; @ &nbsp; → &nbsp; <span class="text-primary2"><%= serverIp %></span> &nbsp; <button data-copy="<%= serverIp %>" class="text-primary2 hover:text-ink ml-1"><i class="fa-regular fa-copy"></i></button></div>
-            <div>A &nbsp; www &nbsp; → &nbsp; <span class="text-primary2"><%= serverIp %></span></div>
-          </div>
-          <p class="mt-2 text-[11px]">Domain aktif 5-30 menit setelah propagasi DNS. SSL terpasang otomatis setelah resolve.</p>
+        <div class="rounded-xl bg-primary/10 border border-primary/40 p-4 text-xs leading-relaxed">
+          <div class="font-display font-semibold text-primary2 mb-1"><i class="fa-solid fa-circle-check"></i> DNS sudah terverifikasi</div>
+          <p class="text-ink2">A record <span class="text-ink font-mono"><%= trx.domain %></span> → <span class="text-primary2 font-mono"><%= serverIp %></span>. Setelah pembayaran sukses, site & SSL akan dibuat otomatis.</p>
         </div>
       <% } %>
 
@@ -115,7 +110,7 @@
               html: 'Hosting <b>' + (j.domain || '') + '</b> sedang di-provisioning ke server.',
               background: '#16161F', color: '#F1F5F9',
               confirmButtonText: 'Ke Dashboard',
-              confirmButtonColor: '#6C63FF',
+              confirmButtonColor: '#10B981',
             }).then(function(){ window.location.href = '/dashboard/hosting'; });
           } else if (j.status === 'EXPIRED' || j.status === 'CANCELED') {
             finished = true;
@@ -125,7 +120,7 @@
               title: j.status === 'EXPIRED' ? 'Pembayaran Kadaluarsa' : 'Pembayaran Dibatalkan',
               text: j.status === 'EXPIRED' ? 'Silakan beli ulang.' : 'Pembayaran berhasil dibatalkan.',
               background: '#16161F', color: '#F1F5F9',
-              confirmButtonColor: '#6C63FF',
+              confirmButtonColor: '#10B981',
             }).then(function(){ window.location.href = '/dashboard'; });
           }
         })

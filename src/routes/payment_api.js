@@ -1,6 +1,8 @@
 'use strict';
 
 const express = require('express');
+const dns = require('dns').promises;
+const rateLimit = require('express-rate-limit');
 const db = require('../lib/db');
 const payment = require('../lib/payment');
 const cloudpanel = require('../lib/cloudpanel');
@@ -8,6 +10,73 @@ const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(requireLogin);
+
+const DOMAIN_RE = /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+const serverIp = () => process.env.SERVER_IP || process.env.CLOUDPANEL_HOST || '';
+
+const dnsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * DNS pre-check — verifikasi A record domain user sebelum diizinkan checkout.
+ * Dipanggil dari /payment/buy/:packageId UI (AJAX).
+ */
+router.get('/dns-check', dnsLimiter, async (req, res) => {
+  const domain = String(req.query.domain || '').trim().toLowerCase();
+  const expected = serverIp();
+
+  if (!DOMAIN_RE.test(domain)) {
+    return res.status(400).json({
+      ok: false,
+      code: 'invalid_domain',
+      expected,
+      message: 'Format domain tidak valid. Contoh: namasaya.com',
+    });
+  }
+  if (!expected) {
+    return res.status(500).json({
+      ok: false,
+      code: 'no_server_ip',
+      expected: '',
+      message: 'Server IP belum dikonfigurasi. Hubungi admin.',
+    });
+  }
+
+  try {
+    const found = await dns.resolve4(domain);
+    const match = found.includes(expected);
+    return res.json({
+      ok: match,
+      code: match ? 'match' : 'mismatch',
+      expected,
+      found,
+      message: match
+        ? `DNS sudah benar — A record ${domain} mengarah ke ${expected}`
+        : `A record ${domain} mengarah ke ${found.join(', ')}, bukan ke ${expected}. Silakan update dulu.`,
+    });
+  } catch (err) {
+    const code = err.code || 'ENOTFOUND';
+    let message;
+    if (code === 'ENOTFOUND' || code === 'ENODATA') {
+      message = `Domain ${domain} belum memiliki A record. Silakan tambahkan A record ke ${expected}.`;
+    } else if (code === 'ESERVFAIL' || code === 'ETIMEOUT') {
+      message = `Lookup gagal (${code}). Tunggu propagasi DNS 5-15 menit lalu cek ulang.`;
+    } else {
+      message = `Gagal memeriksa DNS: ${err.message}`;
+    }
+    return res.json({
+      ok: false,
+      code: code.toLowerCase(),
+      expected,
+      found: [],
+      message,
+    });
+  }
+});
 
 /**
  * Polling endpoint — frontend hits this every 5s.

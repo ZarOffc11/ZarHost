@@ -1,25 +1,45 @@
-<aside class="lg:sticky lg:top-20 self-start lg:w-64 w-full shrink-0">
-  <div class="rounded-2xl border border-border bg-card p-4">
-    <div class="flex items-center gap-3 px-2 py-3 mb-3 border-b border-border">
-      <div class="w-10 h-10 rounded-full bg-brand grid place-items-center text-white font-display font-bold">
-        <%= (currentUser.name || 'U').slice(0,1).toUpperCase() %>
-      </div>
-      <div class="min-w-0">
-        <div class="font-display font-semibold text-ink truncate"><%= currentUser.name %></div>
-        <div class="text-xs text-ink2 truncate"><%= currentUser.email %></div>
-      </div>
-    </div>
-    <nav class="space-y-1 text-sm">
-      <a href="/dashboard"          class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='home'    ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-house w-4"></i> Dashboard</a>
-      <a href="/dashboard/hosting"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='hosting' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-globe w-4"></i> Hosting Saya</a>
-      <a href="/dashboard/history"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='history' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-clock-rotate-left w-4"></i> Riwayat Transaksi</a>
-      <a href="/dashboard/profile"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='profile' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-user w-4"></i> Profil</a>
-      <% if (currentUser.role === 'admin') { %>
-        <a href="/admin" class="flex items-center gap-3 px-3 py-2 rounded-xl text-gold hover:bg-card2"><i class="fa-solid fa-shield-halved w-4"></i> Admin Panel</a>
-      <% } %>
-      <form method="POST" action="/auth/logout">
-        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-ink2 hover:text-danger hover:bg-card2"><i class="fa-solid fa-right-from-bracket w-4"></i> Keluar</button>
-      </form>
-    </nav>
-  </div>
+<%
+  const _sidebarUserLinks = [
+    { href: '/dashboard',         key: 'home',    icon: 'fa-house',               label: 'Dashboard' },
+    { href: '/dashboard/hosting', key: 'hosting', icon: 'fa-globe',               label: 'Hosting Saya' },
+    { href: '/dashboard/history', key: 'history', icon: 'fa-clock-rotate-left',   label: 'Riwayat Transaksi' },
+    { href: '/dashboard/profile', key: 'profile', icon: 'fa-user',                label: 'Profil' },
+    { href: '/pricing',           key: 'buy',     icon: 'fa-cart-plus',           label: 'Beli Paket Baru' },
+  ];
+%>
+
+<!-- Desktop sidebar (sticky, always visible on lg+) -->
+<aside class="hidden lg:block lg:sticky lg:top-20 self-start lg:w-64 shrink-0">
+  <%- include('_sidebar_user_body', { links: _sidebarUserLinks }) %>
 </aside>
+
+<!-- Mobile drawer (toggled via nav hamburger) -->
+<div id="sidebar-mobile" class="sidebar-mobile lg:hidden">
+  <div class="backdrop" data-close-sidebar></div>
+  <div class="panel">
+    <div class="flex items-center justify-between mb-3">
+      <a href="/" class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-brand grid place-items-center shadow-glow">
+          <i class="fa-solid fa-cube text-white text-sm"></i>
+        </span>
+        <span class="font-display font-extrabold text-lg text-ink"><%= brand %></span>
+      </a>
+      <button type="button" data-close-sidebar class="p-2 rounded-lg text-ink2 hover:text-ink hover:bg-card2">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <%- include('_sidebar_user_body', { links: _sidebarUserLinks }) %>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var drawer = document.getElementById('sidebar-mobile');
+    var trigger = document.getElementById('nav-sidebar-toggle');
+    if (trigger && drawer) trigger.addEventListener('click', function () { drawer.classList.add('open'); });
+    document.querySelectorAll('[data-close-sidebar]').forEach(function (el) {
+      el.addEventListener('click', function () { drawer && drawer.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') drawer && drawer.classList.remove('open'); });
+  })();
+</script>

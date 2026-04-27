@@ -1,25 +1,46 @@
-<aside class="lg:sticky lg:top-20 self-start lg:w-64 w-full shrink-0">
-  <div class="rounded-2xl border border-border bg-card p-4">
-    <div class="flex items-center gap-3 px-2 py-3 mb-3 border-b border-border">
-      <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold grid place-items-center text-gold font-display font-bold">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
-      <div class="min-w-0">
-        <div class="font-display font-semibold text-ink truncate">Admin</div>
-        <div class="text-xs text-ink2 truncate"><%= currentUser.email %></div>
-      </div>
-    </div>
-    <nav class="space-y-1 text-sm">
-      <a href="/admin"               class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='home'         ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-gauge-high w-4"></i> Dashboard</a>
-      <a href="/admin/users"         class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='users'        ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-users w-4"></i> Users</a>
-      <a href="/admin/hostings"      class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='hostings'     ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-server w-4"></i> Hostings</a>
-      <a href="/admin/transactions"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='transactions' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-receipt w-4"></i> Transaksi</a>
-      <a href="/admin/packages"      class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='packages'     ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-box w-4"></i> Paket</a>
-      <a href="/admin/vps-config"    class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='vps'          ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-network-wired w-4"></i> VPS Config</a>
-      <a href="/dashboard"           class="flex items-center gap-3 px-3 py-2 rounded-xl text-ink2 hover:text-ink hover:bg-card2"><i class="fa-solid fa-arrow-left-long w-4"></i> Ke User Dashboard</a>
-      <form method="POST" action="/auth/logout">
-        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-ink2 hover:text-danger hover:bg-card2"><i class="fa-solid fa-right-from-bracket w-4"></i> Keluar</button>
-      </form>
-    </nav>
-  </div>
+<%
+  const _sidebarAdminLinks = [
+    { href: '/admin',              key: 'home',         icon: 'fa-gauge-high',    label: 'Dashboard' },
+    { href: '/admin/users',        key: 'users',        icon: 'fa-users',         label: 'Users' },
+    { href: '/admin/hostings',     key: 'hostings',     icon: 'fa-server',        label: 'Hostings' },
+    { href: '/admin/transactions', key: 'transactions', icon: 'fa-receipt',       label: 'Transaksi' },
+    { href: '/admin/packages',     key: 'packages',     icon: 'fa-box',           label: 'Paket' },
+    { href: '/admin/vps-config',   key: 'vps',          icon: 'fa-network-wired', label: 'VPS Config' },
+  ];
+%>
+
+<!-- Desktop sidebar -->
+<aside class="hidden lg:block lg:sticky lg:top-20 self-start lg:w-64 shrink-0">
+  <%- include('_sidebar_admin_body', { links: _sidebarAdminLinks }) %>
 </aside>
+
+<!-- Mobile drawer -->
+<div id="sidebar-mobile" class="sidebar-mobile lg:hidden">
+  <div class="backdrop" data-close-sidebar></div>
+  <div class="panel">
+    <div class="flex items-center justify-between mb-3">
+      <a href="/admin" class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-gold/20 border border-gold grid place-items-center">
+          <i class="fa-solid fa-shield-halved text-gold text-sm"></i>
+        </span>
+        <span class="font-display font-extrabold text-lg text-ink">Admin</span>
+      </a>
+      <button type="button" data-close-sidebar class="p-2 rounded-lg text-ink2 hover:text-ink hover:bg-card2">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <%- include('_sidebar_admin_body', { links: _sidebarAdminLinks }) %>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var drawer = document.getElementById('sidebar-mobile');
+    var trigger = document.getElementById('nav-sidebar-toggle');
+    if (trigger && drawer) trigger.addEventListener('click', function () { drawer.classList.add('open'); });
+    document.querySelectorAll('[data-close-sidebar]').forEach(function (el) {
+      el.addEventListener('click', function () { drawer && drawer.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') drawer && drawer.classList.remove('open'); });
+  })();
+</script>

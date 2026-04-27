@@ -11,7 +11,7 @@ const fs = require('fs');
 
 const db = require('./src/lib/db');
 const cron = require('./src/lib/cron');
-const { attachUser, flashConsumer } = require('./src/middleware/auth');
+const { attachUser, attachLayoutFlags, flashConsumer } = require('./src/middleware/auth');
 const { formatIDR } = require('./src/middleware/ppn');
 
 const app = express();
@@ -66,6 +66,7 @@ app.use((req, res, next) => {
 });
 
 app.use(attachUser);
+app.use(attachLayoutFlags);
 app.use(flashConsumer);
 
 // Routes
