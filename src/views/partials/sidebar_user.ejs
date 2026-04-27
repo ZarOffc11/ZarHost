@@ -35,11 +35,10 @@
 <script>
   (function () {
     var drawer = document.getElementById('sidebar-mobile');
-    var trigger = document.getElementById('nav-sidebar-toggle');
-    if (trigger && drawer) trigger.addEventListener('click', function () { drawer.classList.add('open'); });
+    if (!drawer) return;
     document.querySelectorAll('[data-close-sidebar]').forEach(function (el) {
-      el.addEventListener('click', function () { drawer && drawer.classList.remove('open'); });
+      el.addEventListener('click', function () { drawer.classList.remove('open'); });
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') drawer && drawer.classList.remove('open'); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') drawer.classList.remove('open'); });
   })();
 </script>

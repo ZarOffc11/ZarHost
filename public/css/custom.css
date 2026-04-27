@@ -105,12 +105,12 @@ details.faq[open] .faq-icon { transform: rotate(180deg); }
 }
 .sidebar-mobile.open .panel { transform: translateX(0); }
 
-/* Avatar dropdown */
+/* Avatar dropdown (desktop) */
 .avatar-menu {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  width: 260px;
+  width: 280px;
   background: #0F1318;
   border: 1px solid #1F2730;
   border-radius: 0.85rem;
@@ -119,12 +119,27 @@ details.faq[open] .faq-icon { transform: rotate(180deg); }
   visibility: hidden;
   transform: translateY(-6px);
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-  z-index: 55;
+  z-index: 70;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
 }
 .avatar-menu.open {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+/* Avatar mobile sheet (when viewport too narrow) */
+@media (max-width: 480px) {
+  .avatar-menu {
+    position: fixed;
+    top: 4.5rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    max-height: calc(100vh - 5.5rem);
+    z-index: 70;
+  }
 }
 
 /* Custom checkbox / radio */
