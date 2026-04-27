@@ -2,70 +2,113 @@
 <body class="bg-bg text-ink font-body min-h-screen">
 <%- include('../../partials/alert') %>
 <%- include('../../partials/navbar') %>
+<%- include('../../partials/sidebar_user') %>
 
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="flex flex-col lg:flex-row gap-6">
-    <%- include('../../partials/sidebar_user') %>
-
-    <div class="flex-1 space-y-5 max-w-2xl">
-      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
-        <h1 class="font-display font-extrabold text-2xl">Profil</h1>
-        <p class="text-ink2 text-sm mt-1">Edit informasi akun & ganti password.</p>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+  <div class="grid grid-cols-1 lg:grid-cols-[16rem_1fr] gap-5">
+    <div></div>
+    <div class="min-w-0 space-y-5 max-w-3xl">
+      <!-- Hero -->
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-gradient-to-br from-card2 to-card p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+        <img src="<%= currentUser.avatar %>" alt="avatar" class="w-20 h-20 rounded-full object-cover border-2 border-primary/40 bg-card2 shadow-glow shrink-0" referrerpolicy="no-referrer" />
+        <div class="min-w-0 flex-1">
+          <h1 class="font-display font-extrabold text-2xl md:text-3xl truncate"><%= currentUser.name %></h1>
+          <p class="text-ink2 text-sm mt-0.5 truncate"><%= currentUser.email %></p>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <span class="badge badge-<%= currentUser.role === 'admin' ? 'gold' : 'info' %>">
+              <i class="fa-solid <%= currentUser.role === 'admin' ? 'fa-shield-halved' : 'fa-user' %> text-[10px]"></i>
+              <%= currentUser.role === 'admin' ? 'Administrator' : 'User' %>
+            </span>
+            <span class="badge badge-muted"><i class="fa-solid fa-calendar text-[10px]"></i> Sejak <%= new Date(currentUser.created_at).toLocaleDateString('id-ID') %></span>
+          </div>
+        </div>
       </div>
 
+      <!-- Errors -->
       <% if (errors && errors.length) { %>
-        <div class="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+        <div class="rounded-xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
           <ul class="list-disc pl-4 space-y-1">
             <% errors.forEach(function(e){ %><li><%= e.msg %></li><% }) %>
           </ul>
         </div>
       <% } %>
 
-      <form method="POST" data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 space-y-5">
+      <!-- Avatar section -->
+      <form method="POST" action="/dashboard/profile/avatar" data-aos="fade-up" class="rounded-2xl border border-border bg-card p-5 md:p-6 space-y-4">
         <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Nama</label>
+          <h2 class="font-display font-bold text-lg">Foto Profil</h2>
+          <p class="text-xs text-ink2 mt-0.5">Isi URL gambar untuk foto profil custom, atau kosongkan untuk pakai avatar default (ui-avatars dari nama Anda).</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1">
+            <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Avatar URL</label>
+            <input name="avatar_url" type="url" value="<%= currentUser.avatar_url || '' %>" placeholder="https://example.com/avatar.jpg"
+                   class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div class="flex sm:flex-col gap-2 sm:justify-end">
+            <button type="submit" class="px-5 py-3 rounded-xl bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm whitespace-nowrap">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Foto
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Profile form -->
+      <form method="POST" action="/dashboard/profile" data-aos="fade-up" class="rounded-2xl border border-border bg-card p-5 md:p-6 space-y-5">
+        <div>
+          <h2 class="font-display font-bold text-lg">Informasi Akun</h2>
+          <p class="text-xs text-ink2 mt-0.5">Perbarui nama & password Anda.</p>
+        </div>
+
+        <div>
+          <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Nama</label>
           <input name="name" type="text" required minlength="2" value="<%= currentUser.name %>"
                  class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
         </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Email (read-only)</label>
-          <input type="email" disabled value="<%= currentUser.email %>"
-                 class="mt-1 w-full rounded-xl bg-card2/60 border border-border px-4 py-3 text-sm text-ink2 cursor-not-allowed" />
-        </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Tanggal Daftar</label>
-          <input type="text" disabled value="<%= new Date(currentUser.created_at).toLocaleString('id-ID') %>"
-                 class="mt-1 w-full rounded-xl bg-card2/60 border border-border px-4 py-3 text-sm text-ink2 cursor-not-allowed" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Email <span class="text-muted">(read-only)</span></label>
+            <input type="email" disabled value="<%= currentUser.email %>"
+                   class="mt-1 w-full rounded-xl bg-card2/60 border border-border px-4 py-3 text-sm text-ink2 cursor-not-allowed" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Tanggal Daftar</label>
+            <input type="text" disabled value="<%= new Date(currentUser.created_at).toLocaleString('id-ID') %>"
+                   class="mt-1 w-full rounded-xl bg-card2/60 border border-border px-4 py-3 text-sm text-ink2 cursor-not-allowed" />
+          </div>
         </div>
 
-        <hr class="border-border" />
-        <h3 class="font-display font-bold">Ganti Password (opsional)</h3>
+        <div class="border-t border-border pt-5">
+          <h3 class="font-display font-bold">Ganti Password <span class="text-xs font-normal text-ink2">(opsional)</span></h3>
+        </div>
 
         <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Password Lama</label>
+          <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Password Lama</label>
           <input name="current_password" type="password" autocomplete="current-password"
                  class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
         </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Password Baru</label>
-          <input name="new_password" type="password" minlength="6" autocomplete="new-password"
-                 class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-        </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase tracking-wide">Konfirmasi Password Baru</label>
-          <input name="confirm_password" type="password" minlength="6" autocomplete="new-password"
-                 class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Password Baru</label>
+            <input name="new_password" type="password" minlength="6" autocomplete="new-password"
+                   class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase tracking-wide font-semibold">Konfirmasi Password Baru</label>
+            <input name="confirm_password" type="password" minlength="6" autocomplete="new-password"
+                   class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+          </div>
         </div>
 
         <div class="flex justify-end">
-          <button class="px-6 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm">
-            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan
+          <button class="px-6 py-3 rounded-xl bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan
           </button>
         </div>
       </form>
     </div>
   </div>
-</section>
+</main>
 
 <%- include('../../partials/scripts') %>
 </body>

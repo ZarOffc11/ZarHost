@@ -114,6 +114,24 @@ router.get('/profile', (req, res) => {
   });
 });
 
+router.post('/profile/avatar', (req, res) => {
+  const raw = String(req.body.avatar_url || '').trim();
+  if (raw && !/^https?:\/\/.{4,}/i.test(raw)) {
+    req.session.flash = { type: 'error', message: 'URL avatar tidak valid (harus http/https)' };
+    return res.redirect('/dashboard/profile');
+  }
+  if (raw.length > 500) {
+    req.session.flash = { type: 'error', message: 'URL terlalu panjang (max 500 karakter)' };
+    return res.redirect('/dashboard/profile');
+  }
+  db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(raw || null, req.user.id);
+  req.session.flash = {
+    type: 'success',
+    message: raw ? 'Foto profil diperbarui' : 'Foto profil di-reset ke default',
+  };
+  res.redirect('/dashboard/profile');
+});
+
 router.post(
   '/profile',
   [

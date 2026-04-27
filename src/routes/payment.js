@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const dns = require('dns').promises;
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const db = require('../lib/db');
@@ -11,6 +12,17 @@ const { calc } = require('../middleware/ppn');
 
 const router = express.Router();
 router.use(requireLogin);
+
+const getServerIp = () => process.env.SERVER_IP || process.env.CLOUDPANEL_HOST || '';
+
+async function verifyDns(domain, expectedIp) {
+  try {
+    const found = await dns.resolve4(domain);
+    return { ok: found.includes(expectedIp), found };
+  } catch (err) {
+    return { ok: false, found: [], error: err.code || err.message };
+  }
+}
 
 const buyLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -38,11 +50,12 @@ router.get('/buy/:packageId', (req, res) => {
   if (!pkg) return res.redirect('/pricing');
   res.render('pages/payment/buy', {
     title: 'Beli Hosting',
-    activeMenu: null,
+    activeMenu: 'buy',
     pkg,
     calc,
     errors: [],
     formData: { duration: 1, domain: '' },
+    serverIp: getServerIp(),
   });
 });
 
@@ -68,11 +81,12 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).render('pages/payment/buy', {
           title: 'Beli Hosting',
-          activeMenu: null,
+          activeMenu: 'buy',
           pkg,
           calc,
           errors: errors.array(),
           formData: req.body,
+          serverIp: getServerIp(),
         });
       }
 
@@ -85,12 +99,33 @@ router.post(
       if (dupe) {
         return res.status(409).render('pages/payment/buy', {
           title: 'Beli Hosting',
-          activeMenu: null,
+          activeMenu: 'buy',
           pkg,
           calc,
           errors: [{ msg: 'Domain sudah terdaftar di sistem kami' }],
           formData: req.body,
+          serverIp: getServerIp(),
         });
+      }
+
+      // DNS pre-check — server-side enforcement (frontend sudah validasi, tapi double check agar tidak di-bypass)
+      const expectedIp = getServerIp();
+      if (expectedIp) {
+        const dnsRes = await verifyDns(domain, expectedIp);
+        if (!dnsRes.ok) {
+          const msg = dnsRes.found.length
+            ? `A record ${domain} mengarah ke ${dnsRes.found.join(', ')}, bukan ${expectedIp}. Update DNS terlebih dahulu.`
+            : `Domain ${domain} belum memiliki A record ke ${expectedIp}. Silakan atur DNS lalu klik Verifikasi DNS.`;
+          return res.status(400).render('pages/payment/buy', {
+            title: 'Beli Hosting',
+            activeMenu: 'buy',
+            pkg,
+            calc,
+            errors: [{ msg }],
+            formData: req.body,
+            serverIp: expectedIp,
+          });
+        }
       }
 
       // Create payment at gateway

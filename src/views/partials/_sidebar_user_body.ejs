@@ -1,0 +1,35 @@
+<div class="rounded-2xl border border-border bg-card p-4 shadow-soft">
+  <div class="flex items-center gap-3 px-1 py-2 mb-3 border-b border-border pb-4">
+    <img src="<%= currentUser.avatar %>" alt="avatar" class="w-11 h-11 rounded-full object-cover bg-card2 border border-border" referrerpolicy="no-referrer" />
+    <div class="min-w-0">
+      <div class="font-display font-semibold text-ink truncate"><%= currentUser.name %></div>
+      <div class="text-xs text-ink2 truncate"><%= currentUser.email %></div>
+    </div>
+  </div>
+  <div class="text-[10px] uppercase tracking-widest text-ink2 px-2 mb-1.5 font-semibold">Menu Saya</div>
+  <nav class="space-y-0.5 text-sm">
+    <% links.forEach(function (l) { %>
+      <a href="<%= l.href %>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= activeMenu === l.key ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>">
+        <i class="fa-solid <%= l.icon %> w-4 <%= activeMenu === l.key ? 'text-white' : 'text-primary2' %>"></i>
+        <span><%= l.label %></span>
+      </a>
+    <% }) %>
+
+    <% if (currentUser.role === 'admin') { %>
+      <div class="pt-3 mt-3 border-t border-border">
+        <div class="text-[10px] uppercase tracking-widest text-ink2 px-2 mb-1.5 font-semibold">Admin Zone</div>
+        <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gold hover:bg-gold/10 transition">
+          <i class="fa-solid fa-shield-halved w-4"></i> <span>Admin Panel</span>
+        </a>
+      </div>
+    <% } %>
+
+    <div class="pt-3 mt-3 border-t border-border">
+      <form method="POST" action="/auth/logout">
+        <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-ink2 hover:text-danger hover:bg-danger/10 transition">
+          <i class="fa-solid fa-right-from-bracket w-4"></i> <span>Keluar</span>
+        </button>
+      </form>
+    </div>
+  </nav>
+</div>

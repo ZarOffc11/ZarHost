@@ -2,72 +2,196 @@
 <body class="bg-bg text-ink font-body min-h-screen">
 <%- include('../../partials/alert') %>
 <%- include('../../partials/navbar') %>
+<%- include('../../partials/sidebar_user') %>
 
-<section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-  <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 mb-5">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="font-display font-extrabold text-2xl">Beli Hosting</h1>
-        <p class="text-ink2 text-sm mt-1">Paket <span class="text-ink font-semibold"><%= pkg.name %></span> · <%= formatIDR(pkg.price_monthly) %>/bulan</p>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+  <div class="grid grid-cols-1 lg:grid-cols-[16rem_1fr] gap-5">
+    <!-- (sidebar rendered above, sticky, takes first column on desktop) -->
+    <div></div>
+
+    <div class="min-w-0 space-y-5">
+      <!-- Hero -->
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-gradient-to-br from-card2 to-card p-5 md:p-6">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 text-xs text-ink2 mb-1.5">
+              <a href="/pricing" class="hover:text-primary2"><i class="fa-solid fa-arrow-left mr-1"></i>Pilih paket lain</a>
+              <span>·</span>
+              <span>Paket dipilih</span>
+            </div>
+            <h1 class="font-display font-extrabold text-2xl md:text-3xl truncate">
+              Beli <span class="glow-text"><%= pkg.name %></span>
+            </h1>
+            <p class="text-ink2 text-sm mt-1"><%= formatIDR(pkg.price_monthly) %>/bulan · PPN 11% sudah termasuk</p>
+          </div>
+          <div class="hidden md:flex flex-col items-end gap-1.5">
+            <span class="badge badge-info"><i class="fa-solid fa-hdd"></i> <%= pkg.disk_gb %> GB</span>
+            <span class="badge badge-info"><i class="fa-solid fa-arrow-right-arrow-left"></i> <%= pkg.bandwidth_gb %> GB</span>
+            <% if (pkg.ssl) { %><span class="badge badge-success"><i class="fa-solid fa-lock"></i> SSL Gratis</span><% } %>
+          </div>
+        </div>
       </div>
-      <a href="/pricing" class="text-primary2 hover:underline text-sm"><i class="fa-solid fa-arrow-left"></i> Pilih paket lain</a>
+
+      <!-- Errors -->
+      <% if (errors && errors.length) { %>
+        <div class="rounded-xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger" data-aos="fade-up">
+          <div class="flex gap-2 items-start">
+            <i class="fa-solid fa-triangle-exclamation text-lg mt-0.5"></i>
+            <ul class="space-y-1">
+              <% errors.forEach(function(e){ %><li><%= e.msg %></li><% }) %>
+            </ul>
+          </div>
+        </div>
+      <% } %>
+
+      <form id="buy-form" method="POST" action="/payment/buy/<%= pkg.id %>" data-aos="fade-up" class="space-y-5">
+        <!-- STEP 1 — Domain + DNS verification -->
+        <section class="rounded-2xl border border-border bg-card p-5 md:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-brand text-white grid place-items-center text-sm font-bold shadow-glow">1</div>
+            <div>
+              <h2 class="font-display font-bold text-lg">Domain & Verifikasi DNS</h2>
+              <p class="text-xs text-ink2">Pastikan A record domain Anda sudah mengarah ke server kami</p>
+            </div>
+          </div>
+
+          <label class="block text-xs text-ink2 uppercase tracking-wide font-semibold mb-1.5">Domain yang akan digunakan</label>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex-1 flex items-center rounded-xl border border-border bg-card2 focus-within:border-primary transition">
+              <span class="px-3 text-ink2"><i class="fa-solid fa-globe"></i></span>
+              <input id="domain-input" name="domain" type="text" required value="<%= formData.domain || '' %>"
+                     class="flex-1 bg-transparent py-3 text-sm placeholder-muted focus:outline-none min-w-0" placeholder="contoh: namasaya.com" autocomplete="off" />
+            </div>
+            <button id="btn-verify-dns" type="button" class="px-5 py-3 rounded-xl bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm whitespace-nowrap">
+              <i class="fa-solid fa-satellite-dish mr-1"></i> Verifikasi DNS
+            </button>
+          </div>
+
+          <!-- Server IP info box — selalu tampil saat user mulai input -->
+          <% if (serverIp) { %>
+            <div id="dns-ip-info" class="mt-4 rounded-xl border border-border2 bg-card2 p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 grid place-items-center text-primary2 shrink-0">
+                  <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-semibold text-ink">IP Server ZarHost</div>
+                  <div class="text-xs text-ink2 mt-0.5">Arahkan A record domain Anda ke IP di bawah ini:</div>
+                  <div class="mt-2 flex items-center gap-2 flex-wrap">
+                    <code class="font-mono text-sm md:text-base text-primary2 bg-bg border border-border px-3 py-1.5 rounded-lg select-all"><%= serverIp %></code>
+                    <button type="button" data-copy="<%= serverIp %>" class="px-2.5 py-1.5 rounded-lg border border-border text-ink2 hover:text-ink hover:border-primary/50 text-xs"><i class="fa-regular fa-copy"></i> Salin</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- Status panel — diisi dari JS -->
+          <div id="dns-status" class="mt-3 hidden"></div>
+
+          <!-- DNS instructions (default hidden; tampil saat DNS belum valid) -->
+          <details id="dns-help" class="mt-3 rounded-xl border border-border bg-card2">
+            <summary class="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-ink flex items-center justify-between">
+              <span><i class="fa-solid fa-circle-question text-primary2 mr-1.5"></i> Cara setting A record</span>
+              <i class="fa-solid fa-chevron-down faq-icon text-xs text-ink2"></i>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-sm text-ink2 space-y-3">
+              <ol class="list-decimal pl-5 space-y-1.5">
+                <li>Login ke panel DNS registrar domain Anda (Cloudflare / Niagahoster / GoDaddy / dll).</li>
+                <li>Buka menu <span class="text-ink font-semibold">DNS Records</span> / <span class="text-ink font-semibold">Zone File</span>.</li>
+                <li>Tambahkan 2 baris A record berikut:</li>
+              </ol>
+              <div class="rounded-lg border border-border bg-bg overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead class="text-ink2">
+                    <tr>
+                      <th class="px-3 py-2 text-left font-semibold">Type</th>
+                      <th class="px-3 py-2 text-left font-semibold">Name</th>
+                      <th class="px-3 py-2 text-left font-semibold">Value</th>
+                      <th class="px-3 py-2 text-left font-semibold">TTL</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-ink">
+                    <tr class="border-t border-border">
+                      <td class="px-3 py-2 font-mono text-primary2">A</td>
+                      <td class="px-3 py-2 font-mono">@</td>
+                      <td class="px-3 py-2 font-mono text-primary2"><%= serverIp || 'IP_SERVER' %></td>
+                      <td class="px-3 py-2 text-ink2">3600</td>
+                    </tr>
+                    <tr class="border-t border-border">
+                      <td class="px-3 py-2 font-mono text-primary2">A</td>
+                      <td class="px-3 py-2 font-mono">www</td>
+                      <td class="px-3 py-2 font-mono text-primary2"><%= serverIp || 'IP_SERVER' %></td>
+                      <td class="px-3 py-2 text-ink2">3600</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-xs">Tunggu propagasi DNS <b class="text-ink">5-15 menit</b> (kadang sampai 1 jam), lalu klik tombol <b class="text-ink">Verifikasi DNS</b> di atas.</p>
+            </div>
+          </details>
+        </section>
+
+        <!-- STEP 2 — Durasi (locked until DNS verified) -->
+        <section id="step-2" class="rounded-2xl border border-border bg-card p-5 md:p-6 opacity-50 pointer-events-none transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div id="step-2-num" class="w-8 h-8 rounded-full bg-card2 border border-border text-ink2 grid place-items-center text-sm font-bold">2</div>
+            <div>
+              <h2 class="font-display font-bold text-lg">Pilih Durasi</h2>
+              <p class="text-xs text-ink2">Hemat lebih banyak dengan paket tahunan</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <% [1,3,6,12].forEach(function(m){ %>
+              <label class="cursor-pointer">
+                <input type="radio" name="duration" value="<%= m %>" class="hidden peer dur-radio" <%= (parseInt(formData.duration||'1',10)===m) ? 'checked' : '' %> />
+                <div class="px-4 py-4 rounded-xl border border-border bg-card2 text-center text-sm peer-checked:bg-brand peer-checked:text-white peer-checked:shadow-glow peer-checked:border-primary transition">
+                  <div class="font-display font-semibold text-base"><%= m %></div>
+                  <div class="text-[11px] opacity-80 mt-0.5">bulan</div>
+                </div>
+              </label>
+            <% }) %>
+          </div>
+        </section>
+
+        <!-- STEP 3 — Summary + checkout -->
+        <section id="step-3" class="rounded-2xl border border-border bg-card p-5 md:p-6 opacity-50 pointer-events-none transition">
+          <div class="flex items-center gap-3 mb-4">
+            <div id="step-3-num" class="w-8 h-8 rounded-full bg-card2 border border-border text-ink2 grid place-items-center text-sm font-bold">3</div>
+            <div>
+              <h2 class="font-display font-bold text-lg">Konfirmasi Pembayaran</h2>
+              <p class="text-xs text-ink2">Periksa kembali ringkasan pesanan Anda</p>
+            </div>
+          </div>
+
+          <div class="rounded-xl bg-card2 border border-border p-5 text-sm">
+            <div class="flex justify-between py-1.5"><span class="text-ink2">Paket</span><span class="font-semibold"><%= pkg.name %></span></div>
+            <div class="flex justify-between py-1.5"><span class="text-ink2">Harga</span><span><%= formatIDR(pkg.price_monthly) %> /bln</span></div>
+            <div class="flex justify-between py-1.5"><span class="text-ink2">Durasi</span><span id="dur-text">1 bulan</span></div>
+            <div class="flex justify-between py-1.5"><span class="text-ink2">Subtotal</span><span id="subtotal-text"><%= formatIDR(pkg.price_monthly) %></span></div>
+            <div class="flex justify-between py-1.5"><span class="text-ink2">PPN 11%</span><span id="ppn-text"><%= formatIDR(Math.ceil(pkg.price_monthly * 0.11)) %></span></div>
+            <div class="border-t border-border my-2"></div>
+            <div class="flex justify-between py-1.5 font-display font-bold text-lg"><span>Total</span><span class="glow-text text-xl" id="total-text"><%= formatIDR(pkg.price_monthly + Math.ceil(pkg.price_monthly * 0.11)) %></span></div>
+          </div>
+
+          <div class="mt-5 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+            <a href="/pricing" class="text-center px-5 py-3 rounded-xl border border-border text-ink2 hover:text-ink hover:bg-card2 text-sm font-medium">Batal</a>
+            <button id="btn-checkout" type="submit" disabled class="px-6 py-3 rounded-xl bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+              <i class="fa-solid fa-credit-card mr-1"></i> Bayar Sekarang
+            </button>
+          </div>
+        </section>
+      </form>
     </div>
   </div>
-
-  <% if (errors && errors.length) { %>
-    <div class="mb-4 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-      <ul class="list-disc pl-4 space-y-1">
-        <% errors.forEach(function(e){ %><li><%= e.msg %></li><% }) %>
-      </ul>
-    </div>
-  <% } %>
-
-  <form method="POST" action="/payment/buy/<%= pkg.id %>" data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 space-y-6">
-    <div>
-      <label class="text-xs text-ink2 uppercase tracking-wide">Domain yang akan digunakan</label>
-      <div class="mt-1 flex items-center rounded-xl border border-border bg-card2 focus-within:border-primary transition">
-        <span class="px-3 text-ink2"><i class="fa-solid fa-globe"></i></span>
-        <input name="domain" type="text" required value="<%= formData.domain || '' %>"
-               class="flex-1 bg-transparent py-3 text-sm placeholder-muted focus:outline-none" placeholder="contoh: namasaya.com" />
-      </div>
-      <p class="text-xs text-ink2 mt-2">Pastikan Anda memiliki domain ini. Sistem akan otomatis membuat site di server CloudPanel.</p>
-    </div>
-
-    <div>
-      <div class="text-xs text-ink2 uppercase mb-2">Durasi</div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <% [1,3,6,12].forEach(function(m){ %>
-          <label class="cursor-pointer">
-            <input type="radio" name="duration" value="<%= m %>" class="hidden peer dur-radio" <%= (parseInt(formData.duration||'1',10)===m) ? 'checked' : '' %> />
-            <div class="px-4 py-3 rounded-xl border border-border bg-card2 text-center text-sm peer-checked:bg-brand peer-checked:text-white peer-checked:shadow-glow peer-checked:border-primary transition">
-              <div class="font-display font-semibold"><%= m %> Bulan</div>
-            </div>
-          </label>
-        <% }) %>
-      </div>
-    </div>
-
-    <div class="rounded-xl bg-card2 border border-border p-5 text-sm">
-      <div class="flex justify-between py-1"><span class="text-ink2">Harga Paket</span><span><%= formatIDR(pkg.price_monthly) %> /bln</span></div>
-      <div class="flex justify-between py-1"><span class="text-ink2">Durasi</span><span id="dur-text">1 bulan</span></div>
-      <div class="flex justify-between py-1"><span class="text-ink2">Subtotal</span><span id="subtotal-text"><%= formatIDR(pkg.price_monthly) %></span></div>
-      <div class="flex justify-between py-1"><span class="text-ink2">PPN 11%</span><span id="ppn-text"><%= formatIDR(Math.ceil(pkg.price_monthly * 0.11)) %></span></div>
-      <div class="border-t border-border my-2"></div>
-      <div class="flex justify-between py-1 font-display font-bold text-lg"><span>Total Bayar</span><span class="glow-text" id="total-text"><%= formatIDR(pkg.price_monthly + Math.ceil(pkg.price_monthly * 0.11)) %></span></div>
-    </div>
-
-    <div class="flex gap-3 justify-end">
-      <a href="/pricing" class="px-5 py-3 rounded-full border border-border text-ink2 hover:text-ink hover:bg-card2 text-sm">Batal</a>
-      <button class="px-6 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm">
-        <i class="fa-solid fa-credit-card mr-1"></i> Bayar Sekarang
-      </button>
-    </div>
-  </form>
-</section>
+</main>
 
 <%- include('../../partials/scripts') %>
 <script>
   var price = <%= pkg.price_monthly %>;
+  var expectedIp = <%- JSON.stringify(serverIp || '') %>;
+  var dnsVerified = false;
+
   function recalc() {
     var months = parseInt(document.querySelector('.dur-radio:checked')?.value || '1', 10);
     var subtotal = price * months;
@@ -80,6 +204,114 @@
   }
   document.querySelectorAll('.dur-radio').forEach(function(r){ r.addEventListener('change', recalc); });
   recalc();
+
+  var statusEl = document.getElementById('dns-status');
+  var helpEl = document.getElementById('dns-help');
+  var step2 = document.getElementById('step-2');
+  var step3 = document.getElementById('step-3');
+  var btnCheckout = document.getElementById('btn-checkout');
+  var btnVerify = document.getElementById('btn-verify-dns');
+  var domainInput = document.getElementById('domain-input');
+
+  function setStatus(type, html) {
+    if (!statusEl) return;
+    statusEl.classList.remove('hidden', 'fade-in');
+    void statusEl.offsetWidth;
+    statusEl.classList.add('fade-in');
+    var colors = {
+      success: 'border-primary/40 bg-primary/10 text-primary2',
+      error:   'border-danger/40 bg-danger/10 text-danger',
+      info:    'border-border2 bg-card2 text-ink',
+    };
+    statusEl.className = 'mt-3 rounded-xl border p-4 text-sm fade-in ' + (colors[type] || colors.info);
+    statusEl.innerHTML = html;
+  }
+
+  function unlockCheckout() {
+    dnsVerified = true;
+    [step2, step3].forEach(function (s) {
+      s.classList.remove('opacity-50', 'pointer-events-none');
+    });
+    // Mark step circles active
+    document.getElementById('step-2-num').className = 'w-8 h-8 rounded-full bg-brand text-white grid place-items-center text-sm font-bold shadow-glow';
+    document.getElementById('step-3-num').className = 'w-8 h-8 rounded-full bg-brand text-white grid place-items-center text-sm font-bold shadow-glow';
+    btnCheckout.disabled = false;
+  }
+  function lockCheckout() {
+    dnsVerified = false;
+    [step2, step3].forEach(function (s) {
+      s.classList.add('opacity-50', 'pointer-events-none');
+    });
+    document.getElementById('step-2-num').className = 'w-8 h-8 rounded-full bg-card2 border border-border text-ink2 grid place-items-center text-sm font-bold';
+    document.getElementById('step-3-num').className = 'w-8 h-8 rounded-full bg-card2 border border-border text-ink2 grid place-items-center text-sm font-bold';
+    btnCheckout.disabled = true;
+  }
+
+  async function verifyDns() {
+    var domain = (domainInput.value || '').trim().toLowerCase();
+    if (!domain) {
+      setStatus('error', '<i class="fa-solid fa-triangle-exclamation"></i> Masukkan domain dulu, misal: <code class="font-mono">namasaya.com</code>');
+      return;
+    }
+    var original = btnVerify.innerHTML;
+    btnVerify.disabled = true;
+    btnVerify.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memeriksa…';
+    setStatus('info', '<i class="fa-solid fa-satellite-dish"></i> Sedang cek A record <b>' + domain + '</b> ke <code class="font-mono">' + expectedIp + '</code>…');
+
+    try {
+      var r = await fetch('/api/payment/dns-check?domain=' + encodeURIComponent(domain), { credentials: 'same-origin' });
+      var j = await r.json();
+      if (j.ok) {
+        setStatus('success',
+          '<div class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-base mt-0.5"></i>' +
+          '<div><div class="font-semibold">DNS valid — Anda dapat lanjut ke pembayaran.</div>' +
+          '<div class="text-xs text-ink2 mt-0.5">A record <b class="text-ink">' + domain + '</b> mengarah ke <code class="font-mono">' + expectedIp + '</code></div>' +
+          '</div></div>'
+        );
+        helpEl.removeAttribute('open');
+        unlockCheckout();
+        ZH.toast && ZH.toast('success', 'DNS sudah benar');
+      } else {
+        var foundHtml = '';
+        if (j.found && j.found.length) {
+          foundHtml = '<div class="text-xs mt-1 text-ink2">Saat ini mengarah ke: <code class="font-mono text-danger">' + j.found.join(', ') + '</code></div>';
+        }
+        setStatus('error',
+          '<div class="flex items-start gap-2"><i class="fa-solid fa-circle-xmark text-base mt-0.5"></i>' +
+          '<div class="flex-1 min-w-0"><div class="font-semibold">' + (j.message || 'DNS belum valid') + '</div>' +
+          foundHtml +
+          '<div class="text-xs text-ink2 mt-2">Silakan set A record berikut:</div>' +
+          '<div class="mt-1.5 rounded-lg bg-bg/50 border border-danger/30 p-2 font-mono text-xs text-ink">A @ → <span class="text-primary2">' + expectedIp + '</span> &nbsp;|&nbsp; A www → <span class="text-primary2">' + expectedIp + '</span></div>' +
+          '<button type="button" onclick="verifyDnsRetry()" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/40 text-primary2 hover:bg-primary/30 text-xs font-semibold"><i class="fa-solid fa-rotate-right"></i> Cek Ulang</button>' +
+          '</div></div>'
+        );
+        helpEl.setAttribute('open', '');
+        lockCheckout();
+      }
+    } catch (err) {
+      setStatus('error', '<i class="fa-solid fa-circle-xmark"></i> Gagal memanggil server: ' + (err.message || err));
+      lockCheckout();
+    } finally {
+      btnVerify.disabled = false;
+      btnVerify.innerHTML = original;
+    }
+  }
+  window.verifyDnsRetry = verifyDns;
+
+  btnVerify.addEventListener('click', verifyDns);
+  domainInput.addEventListener('input', function () { if (dnsVerified) lockCheckout(); });
+  domainInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); verifyDns(); }
+  });
+
+  // Safety net: if user tries to submit without verify, block it.
+  document.getElementById('buy-form').addEventListener('submit', function (e) {
+    if (!dnsVerified) {
+      e.preventDefault();
+      ZH.toast && ZH.toast('warning', 'Klik "Verifikasi DNS" terlebih dahulu');
+      verifyDns();
+    }
+  });
 </script>
 </body>
 </html>

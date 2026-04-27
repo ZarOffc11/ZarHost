@@ -83,13 +83,13 @@
         title: j.ok ? 'CloudPanel terdeteksi!' : 'Tidak dapat terhubung',
         html: '<div class="text-sm">' + (j.message || '').replace(/</g,'&lt;') + '</div>' + (j.version ? '<div class="text-xs mt-2">Versi: ' + j.version + '</div>' : ''),
         background: '#16161F', color: '#F1F5F9',
-        confirmButtonColor: '#6C63FF',
+        confirmButtonColor: '#10B981',
       });
     })
     .catch(function(err){
       Swal.fire({
         icon: 'error', title: 'Error', text: err.message,
-        background: '#16161F', color: '#F1F5F9', confirmButtonColor: '#6C63FF',
+        background: '#16161F', color: '#F1F5F9', confirmButtonColor: '#10B981',
       });
     });
   });

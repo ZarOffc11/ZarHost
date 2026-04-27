@@ -113,9 +113,16 @@ function migrate() {
 
   // Forward-migration: tabel lama mungkin masih punya kolom nameserver1/2.
   // Tambahkan server_ip jika belum ada, biarkan kolom lama (tidak fatal).
-  const cols = db.prepare("PRAGMA table_info(hosting_credentials)").all().map((c) => c.name);
-  if (!cols.includes('server_ip')) {
+  const credCols = db.prepare("PRAGMA table_info(hosting_credentials)").all().map((c) => c.name);
+  if (!credCols.includes('server_ip')) {
     db.exec("ALTER TABLE hosting_credentials ADD COLUMN server_ip TEXT");
+  }
+
+  // Forward-migration: tambah avatar_url di users (placeholder ui-avatars.com,
+  // user bisa override via URL custom di profile settings).
+  const userCols = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
+  if (!userCols.includes('avatar_url')) {
+    db.exec("ALTER TABLE users ADD COLUMN avatar_url TEXT");
   }
 }
 
