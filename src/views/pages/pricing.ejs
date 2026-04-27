@@ -1,0 +1,81 @@
+<%- include('../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../partials/alert') %>
+<%- include('../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="text-center mb-10" data-aos="fade-up">
+    <h1 class="font-display font-extrabold text-4xl md:text-5xl">Pilih <span class="glow-text">Paket Anda</span></h1>
+    <p class="text-ink2 mt-3">Diskon otomatis untuk durasi panjang. Belum termasuk PPN 11%.</p>
+  </div>
+
+  <!-- Duration toggle -->
+  <div class="flex justify-center gap-2 mb-8" data-aos="fade-up">
+    <% var durs = [{m:1,d:0,l:'1 Bulan'},{m:3,d:5,l:'3 Bulan'},{m:6,d:10,l:'6 Bulan'},{m:12,d:15,l:'12 Bulan'}]; %>
+    <% durs.forEach(function(x, i){ %>
+      <button data-dur="<%= x.m %>" data-disc="<%= x.d %>"
+              class="dur-btn px-4 py-2 rounded-full text-sm border border-border <%= i===0 ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card' %>"
+              ><%= x.l %><% if (x.d) { %> <span class="text-emerald font-semibold ml-1">-<%= x.d %>%</span><% } %></button>
+    <% }) %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <% packages.forEach(function(p, idx) { %>
+      <div data-aos="fade-up" data-aos-delay="<%= idx*80 %>"
+           class="relative rounded-2xl border <%= p.name === 'Pro' ? 'border-primary' : 'border-border' %> bg-card p-6 card-hover">
+        <% if (p.name === 'Pro') { %>
+          <span class="absolute -top-3 right-4 pop-badge px-3 py-1 rounded-full text-xs">POPULER</span>
+        <% } %>
+        <h3 class="font-display font-bold text-xl"><%= p.name %></h3>
+        <p class="text-ink2 text-sm mt-1"><%= p.description %></p>
+        <div class="mt-4">
+          <span class="font-display font-extrabold text-3xl price-display" data-base="<%= p.price_monthly %>"><%= formatIDR(p.price_monthly) %></span>
+          <span class="text-ink2 text-sm period-display">/bulan</span>
+        </div>
+        <div class="text-xs text-ink2 mt-1">
+          <span>+ PPN 11% = </span><span class="text-ink ppn-display"><%= formatIDR(Math.ceil(p.price_monthly * 0.11)) %></span>
+        </div>
+        <ul class="mt-5 space-y-2 text-sm text-ink2">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-hard-drive text-primary2"></i> <%= p.disk_gb %> GB SSD NVMe</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-network-wired text-primary2"></i> <%= p.bandwidth_gb %> GB Bandwidth</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-globe text-primary2"></i> <%= p.max_sites %> Site</li>
+          <li class="flex items-center gap-2"><i class="fa-solid <%= p.ssl ? 'fa-check text-emerald' : 'fa-xmark text-muted' %>"></i> SSL Gratis</li>
+          <li class="flex items-center gap-2"><i class="fa-solid <%= p.backup ? 'fa-check text-emerald' : 'fa-xmark text-muted' %>"></i> Backup Otomatis</li>
+        </ul>
+        <a href="<%= currentUser ? '/payment/buy/'+p.id : '/auth/login' %>"
+           class="mt-6 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition">
+          <i class="fa-solid fa-cart-shopping"></i> Beli Sekarang
+        </a>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+<%- include('../partials/scripts') %>
+<script>
+  document.querySelectorAll('.dur-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.dur-btn').forEach(function(b){
+        b.classList.remove('bg-brand','text-white','shadow-glow');
+        b.classList.add('text-ink2');
+      });
+      btn.classList.add('bg-brand','text-white','shadow-glow');
+      btn.classList.remove('text-ink2');
+      var months = parseInt(btn.dataset.dur, 10);
+      var disc = parseInt(btn.dataset.disc, 10);
+      document.querySelectorAll('.price-display').forEach(function(el){
+        var base = parseInt(el.dataset.base, 10);
+        var subtotal = base * months;
+        var afterDisc = Math.round(subtotal * (1 - disc/100));
+        el.textContent = ZH.formatIDR(afterDisc);
+        var per = el.parentElement.querySelector('.period-display');
+        if (per) per.textContent = '/' + months + ' bln';
+        var ppnEl = el.parentElement.parentElement.querySelector('.ppn-display');
+        if (ppnEl) ppnEl.textContent = ZH.formatIDR(Math.ceil(afterDisc * 0.11));
+      });
+    });
+  });
+</script>
+</body>
+</html>

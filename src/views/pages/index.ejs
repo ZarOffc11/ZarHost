@@ -1,0 +1,248 @@
+<%- include('../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../partials/alert') %>
+<%- include('../partials/navbar') %>
+
+<!-- HERO -->
+<section class="relative overflow-hidden">
+  <div id="tsparticles"></div>
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
+    <div data-aos="fade-right">
+      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs border border-primary/40 bg-primary/10 text-primary2 mb-5">
+        <i class="fa-solid fa-bolt"></i> Provisioning Otomatis · Aktif Dalam Hitungan Detik
+      </span>
+      <h1 class="font-display font-extrabold text-4xl md:text-6xl leading-[1.1] tracking-tight">
+        Hosting <span class="glow-text">Cepat</span>, Aman, &amp; Terpercaya untuk Website Anda.
+      </h1>
+      <p class="mt-5 text-ink2 text-base md:text-lg max-w-xl leading-relaxed">
+        Berbasis CloudPanel + SSD NVMe. Bayar QRIS, sistem otomatis siapkan
+        site, database, dan SSL tanpa antri admin.
+      </p>
+      <div class="mt-7 flex flex-col sm:flex-row gap-3">
+        <a href="/auth/register" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition">
+          <i class="fa-solid fa-rocket"></i> Mulai Sekarang
+        </a>
+        <a href="/pricing" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-primary/60 text-ink hover:bg-primary/10 transition">
+          <i class="fa-solid fa-list-ul"></i> Lihat Paket
+        </a>
+      </div>
+      <div class="mt-8 flex items-center gap-6 text-xs text-ink2">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald"></i> SSL Gratis</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-clock text-emerald"></i> Uptime 99.9%</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-headset text-emerald"></i> Support 24/7</div>
+      </div>
+    </div>
+    <div data-aos="fade-left" class="relative">
+      <div class="rounded-2xl border border-border bg-card p-6 shadow-glow">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-3 h-3 rounded-full bg-danger"></div>
+          <div class="w-3 h-3 rounded-full bg-gold"></div>
+          <div class="w-3 h-3 rounded-full bg-emerald"></div>
+          <div class="text-xs text-ink2 ml-2">terminal · zarhost</div>
+        </div>
+        <pre class="text-xs leading-relaxed text-ink2 overflow-hidden"><span class="text-primary2">$</span> zarhost provision <span class="text-emerald">--domain=blog.id</span>
+<span class="text-ink2">→ connecting to vps.zarhost.id ...</span>
+<span class="text-emerald">✓ CloudPanel detected (v2.4)</span>
+<span class="text-emerald">✓ site.addPhp blog.id (PHP 8.4, WordPress)</span>
+<span class="text-emerald">✓ database.add blog_db</span>
+<span class="text-emerald">✓ letsEncrypt.installCertificate</span>
+<span class="text-primary2">─────────────────────────────────────</span>
+<span class="text-emerald">DONE</span> in <span class="text-gold">12.4s</span>. Hosting active.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-16">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <% var stats = [
+      { icon: 'fa-users',   label: 'Pengguna Aktif',   value: 12480, suffix: '+' },
+      { icon: 'fa-bolt',    label: 'Uptime',           value: 99.9,  suffix: '%' },
+      { icon: 'fa-server',  label: 'Server Aktif',     value: 24,    suffix: '' }
+    ]; %>
+    <% stats.forEach(function(s, i) { %>
+      <div data-aos="zoom-in" data-aos-delay="<%= i*80 %>" class="rounded-2xl border border-border bg-card p-6 card-hover">
+        <div class="flex items-center gap-3 text-ink2 text-sm">
+          <span class="w-9 h-9 rounded-xl bg-primary/15 grid place-items-center text-primary2"><i class="fa-solid <%= s.icon %>"></i></span>
+          <%= s.label %>
+        </div>
+        <div class="mt-3 font-display font-extrabold text-3xl text-ink">
+          <span data-counter="<%= s.value %>">0</span><%= s.suffix %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="fitur" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center mb-10" data-aos="fade-up">
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl">Fitur <span class="glow-text">Unggulan</span></h2>
+    <p class="text-ink2 mt-3">Semua yang Anda butuhkan untuk menjalankan website modern.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <% var feats = [
+      { icon:'fa-microchip',     t:'SSD NVMe',          d:'Storage cepat dengan IOPS tinggi untuk performa maksimal.' },
+      { icon:'fa-lock',          t:'SSL Gratis',        d:"Let's Encrypt otomatis terpasang di setiap domain." },
+      { icon:'fa-cloud-arrow-up',t:'Backup Otomatis',   d:'Backup harian/mingguan untuk paket Pro ke atas.' },
+      { icon:'fa-headset',       t:'Support 24/7',      d:'Tim support kami siap membantu kapan saja.' },
+      { icon:'fa-gauge-high',    t:'Uptime 99.9%',      d:'Garansi uptime tinggi dengan monitoring real-time.' },
+      { icon:'fa-sliders',       t:'Panel Mudah',       d:'CloudPanel modern dan intuitif, kelola hosting tanpa ribet.' }
+    ]; %>
+    <% feats.forEach(function(f, i) { %>
+      <div data-aos="fade-up" data-aos-delay="<%= (i%3)*80 %>" class="rounded-2xl border border-border bg-card p-6 card-hover">
+        <div class="w-12 h-12 grid place-items-center rounded-xl bg-brand text-white shadow-glow mb-4">
+          <i class="fa-solid <%= f.icon %> text-lg"></i>
+        </div>
+        <h3 class="font-display font-bold text-lg"><%= f.t %></h3>
+        <p class="text-ink2 mt-2 text-sm leading-relaxed"><%= f.d %></p>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="paket" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center mb-10" data-aos="fade-up">
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl">Paket <span class="glow-text">Hosting</span></h2>
+    <p class="text-ink2 mt-3">Harga sudah termasuk semua fitur penting. Tambah PPN 11% saat checkout.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <% packages.forEach(function(p, idx) { %>
+      <div data-aos="fade-up" data-aos-delay="<%= idx*80 %>"
+           class="relative rounded-2xl border <%= p.name === 'Pro' ? 'border-primary' : 'border-border' %> bg-card p-6 card-hover">
+        <% if (p.name === 'Pro') { %>
+          <span class="absolute -top-3 right-4 pop-badge px-3 py-1 rounded-full text-xs">POPULER</span>
+        <% } %>
+        <h3 class="font-display font-bold text-xl"><%= p.name %></h3>
+        <p class="text-ink2 text-sm mt-1"><%= p.description %></p>
+        <div class="mt-4">
+          <span class="font-display font-extrabold text-3xl"><%= formatIDR(p.price_monthly) %></span>
+          <span class="text-ink2 text-sm">/bulan</span>
+        </div>
+        <ul class="mt-5 space-y-2 text-sm text-ink2">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald"></i> <%= p.disk_gb %> GB SSD NVMe</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald"></i> <%= p.bandwidth_gb %> GB Bandwidth</li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald"></i> <%= p.max_sites %> Site</li>
+          <li class="flex items-center gap-2"><i class="fa-solid <%= p.ssl ? 'fa-check text-emerald' : 'fa-xmark text-muted' %>"></i> SSL Gratis</li>
+          <li class="flex items-center gap-2"><i class="fa-solid <%= p.backup ? 'fa-check text-emerald' : 'fa-xmark text-muted' %>"></i> Backup Otomatis</li>
+        </ul>
+        <a href="<%= currentUser ? '/payment/buy/'+p.id : '/auth/login' %>"
+           class="mt-6 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition">
+          <i class="fa-solid fa-cart-shopping"></i> Beli Sekarang
+        </a>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center mb-10" data-aos="fade-up">
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl">Apa Kata <span class="glow-text">Pelanggan</span></h2>
+  </div>
+  <div class="grid md:grid-cols-3 gap-5">
+    <% var tt = [
+      { name:'Andi Pratama',  role:'Web Developer',   text:'Setup baru cepet banget, baru bayar 5 menit udah bisa upload site. Mantap.' },
+      { name:'Citra Kusuma',  role:'Owner Toko Online',text:'Toko WooCommerce saya tahan lonjakan trafik flash sale. Tim support juga responsif.' },
+      { name:'Budi Hartono',  role:'Blogger',         text:'Panel CloudPanel-nya nyaman dipakai. Backup otomatis bikin tenang.' }
+    ]; %>
+    <% tt.forEach(function(t, i) { %>
+      <div data-aos="fade-up" data-aos-delay="<%= i*80 %>" class="rounded-2xl border border-border bg-card p-6">
+        <div class="flex gap-1 text-gold text-sm mb-3">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+        </div>
+        <p class="text-ink2 text-sm leading-relaxed">"<%= t.text %>"</p>
+        <div class="mt-5 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-brand grid place-items-center text-white font-display font-bold"><%= t.name.charAt(0) %></div>
+          <div>
+            <div class="font-display font-semibold text-ink"><%= t.name %></div>
+            <div class="text-xs text-ink2"><%= t.role %></div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center mb-10" data-aos="fade-up">
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl">FAQ</h2>
+  </div>
+  <% var faq = [
+    { q:'Berapa lama hosting saya aktif setelah pembayaran?',
+      a:'Provisioning otomatis ke server CloudPanel — biasanya kurang dari 30 detik setelah QRIS terbayar.' },
+    { q:'Apakah saya bisa migrasi dari hosting lain?',
+      a:'Bisa. Tim kami akan bantu migrasi gratis untuk paket Business & Enterprise.' },
+    { q:'Apakah harga sudah termasuk PPN?',
+      a:'Belum. PPN 11% akan dikalkulasi otomatis di halaman checkout.' },
+    { q:'Apakah ada garansi uang kembali?',
+      a:'Ya, kami menyediakan garansi 7 hari uang kembali untuk pembelian baru.' },
+    { q:'Bagaimana cara perpanjang hosting?',
+      a:'Login ke dashboard, klik Hosting Saya → Perpanjang, pilih durasi, dan bayar.' }
+  ]; %>
+  <div class="space-y-3">
+    <% faq.forEach(function(f, i) { %>
+      <details class="faq rounded-2xl border border-border bg-card p-5" data-aos="fade-up" data-aos-delay="<%= i*60 %>">
+        <summary class="flex items-center justify-between gap-4">
+          <span class="font-display font-semibold text-ink"><%= f.q %></span>
+          <i class="fa-solid fa-chevron-down faq-icon text-ink2"></i>
+        </summary>
+        <p class="mt-3 text-ink2 text-sm leading-relaxed"><%= f.a %></p>
+      </details>
+    <% }) %>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div data-aos="zoom-in" class="rounded-2xl bg-brand p-10 md:p-14 text-center text-white shadow-glow">
+    <h2 class="font-display font-extrabold text-3xl md:text-4xl">Siap Memulai?</h2>
+    <p class="mt-3 text-white/80">Daftar gratis sekarang & dapatkan hosting yang aktif dalam hitungan detik.</p>
+    <a href="/auth/register" class="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-full bg-white text-primary font-semibold hover:scale-[1.02] transition">
+      <i class="fa-solid fa-rocket"></i> Daftar Sekarang
+    </a>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+<%- include('../partials/scripts') %>
+<script>
+  // tsParticles
+  if (window.tsParticles) {
+    tsParticles.load('tsparticles', {
+      fullScreen: { enable: false },
+      background: { color: 'transparent' },
+      fpsLimit: 60,
+      particles: {
+        number: { value: 60, density: { enable: true, area: 800 } },
+        color: { value: ['#6C63FF', '#A78BFA'] },
+        opacity: { value: 0.3 },
+        size: { value: { min: 1, max: 3 } },
+        links: { enable: true, color: '#6C63FF', opacity: 0.18, distance: 130 },
+        move: { enable: true, speed: 0.6 }
+      },
+      interactivity: {
+        events: { onHover: { enable: true, mode: 'grab' } },
+        modes: { grab: { distance: 140, links: { opacity: 0.4 } } }
+      },
+      detectRetina: true
+    });
+  }
+  // Counters
+  document.querySelectorAll('[data-counter]').forEach(function(el) {
+    var target = parseFloat(el.dataset.counter);
+    var isFloat = !Number.isInteger(target);
+    var current = 0;
+    var step = target / 60;
+    var t = setInterval(function() {
+      current += step;
+      if (current >= target) { current = target; clearInterval(t); }
+      el.textContent = isFloat ? current.toFixed(1) : Math.floor(current).toLocaleString('id-ID');
+    }, 16);
+  });
+</script>
+</body>
+</html>

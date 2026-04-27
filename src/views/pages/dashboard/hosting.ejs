@@ -1,0 +1,152 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_user') %>
+
+    <div class="flex-1 space-y-5">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="font-display font-extrabold text-2xl">Hosting Saya</h1>
+          <p class="text-ink2 text-sm mt-1">Kelola hosting & lihat info akses (SSH, DB, Nameserver).</p>
+        </div>
+        <a href="/pricing" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand text-white shadow-glow hover:shadow-glowHover transition text-sm">
+          <i class="fa-solid fa-plus"></i> Beli Hosting Baru
+        </a>
+      </div>
+
+      <% if (!hostings.length) { %>
+        <div class="rounded-2xl border border-border bg-card p-12 text-center text-ink2" data-aos="fade-up">
+          <i class="fa-solid fa-globe text-4xl text-primary2 mb-3"></i>
+          <p>Belum ada hosting aktif.</p>
+          <a href="/pricing" class="inline-flex items-center gap-2 mt-4 px-5 py-2 rounded-full bg-brand text-white shadow-glow hover:shadow-glowHover transition text-sm">
+            <i class="fa-solid fa-rocket"></i> Lihat Paket
+          </a>
+        </div>
+      <% } else { %>
+        <% hostings.forEach(function(h, idx){ %>
+          <% var nearExpiry = h.expired_at && (new Date(h.expired_at) - new Date()) < 7*86400000 && h.status === 'active'; %>
+          <div data-aos="fade-up" data-aos-delay="<%= idx*60 %>" class="rounded-2xl border border-border bg-card overflow-hidden">
+            <% if (nearExpiry) { %>
+              <div class="bg-danger/15 border-b border-danger/40 text-danger text-xs px-5 py-2 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> Hosting akan expired dalam kurang dari 7 hari (<%= new Date(h.expired_at).toLocaleString('id-ID') %>). Segera perpanjang.
+              </div>
+            <% } %>
+            <% if (h.status === 'provision_failed') { %>
+              <div class="bg-danger/15 border-b border-danger/40 text-danger text-xs px-5 py-2 flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i> Provisioning ke VPS gagal. Hubungi admin untuk bantuan retry.
+              </div>
+            <% } %>
+            <div class="p-6">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-display font-bold text-xl"><%= h.domain %></h3>
+                    <%- include('../../partials/_status_badge', { status: h.status }) %>
+                  </div>
+                  <p class="text-ink2 text-sm mt-1">Paket <span class="text-ink"><%= h.package_name %></span> · <%= formatIDR(h.price_monthly) %>/bulan</p>
+                </div>
+                <div class="flex gap-2">
+                  <% if (h.status === 'active' || h.status === 'expired' || h.status === 'suspended') { %>
+                    <a href="/dashboard/renew/<%= h.id %>" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand text-white text-sm shadow-glow hover:shadow-glowHover transition">
+                      <i class="fa-solid fa-rotate-right"></i> Perpanjang
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-5 text-xs">
+                <div class="rounded-xl bg-card2 border border-border p-3"><div class="text-ink2">Disk</div><div class="font-display font-semibold text-ink mt-1"><%= h.disk_gb %> GB</div></div>
+                <div class="rounded-xl bg-card2 border border-border p-3"><div class="text-ink2">Bandwidth</div><div class="font-display font-semibold text-ink mt-1"><%= h.bandwidth_gb %> GB</div></div>
+                <div class="rounded-xl bg-card2 border border-border p-3"><div class="text-ink2">Site Limit</div><div class="font-display font-semibold text-ink mt-1"><%= h.max_sites %></div></div>
+                <div class="rounded-xl bg-card2 border border-border p-3"><div class="text-ink2">Mulai</div><div class="font-display font-semibold text-ink mt-1"><%= h.started_at ? new Date(h.started_at).toLocaleDateString('id-ID') : '-' %></div></div>
+                <div class="rounded-xl bg-card2 border border-border p-3"><div class="text-ink2">Expired</div><div class="font-display font-semibold text-ink mt-1"><%= h.expired_at ? new Date(h.expired_at).toLocaleDateString('id-ID') : '-' %></div></div>
+              </div>
+
+              <% if (h.credentials) { %>
+                <details class="mt-5 rounded-xl border border-border bg-card2">
+                  <summary class="cursor-pointer px-5 py-3 flex items-center justify-between text-sm">
+                    <span class="font-display font-semibold flex items-center gap-2"><i class="fa-solid fa-key text-primary2"></i> Info Akses Hosting</span>
+                    <i class="fa-solid fa-chevron-down faq-icon text-ink2"></i>
+                  </summary>
+                  <div class="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="rounded-xl bg-card border border-border p-4">
+                      <div class="font-display font-semibold text-ink mb-2"><i class="fa-solid fa-folder-open text-primary2"></i> File Manager (SSH/SFTP)</div>
+                      <div class="space-y-2 text-ink2">
+                        <div>Host: <span class="text-ink"><%= h.credentials.ftp_host || '-' %></span></div>
+                        <div>Port: <span class="text-ink">22</span></div>
+                        <div class="flex items-center gap-2">
+                          <span>User:</span>
+                          <span class="text-ink font-mono"><%= h.credentials.site_user || '-' %></span>
+                          <button data-copy="<%= h.credentials.site_user || '' %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span>Password:</span>
+                          <input id="ssh-pass-<%= h.id %>" type="password" readonly value="<%= h.credentials.site_user_pass || '' %>" class="bg-card border border-border rounded px-2 py-1 text-ink font-mono w-40" />
+                          <button type="button" data-toggle-pass="ssh-pass-<%= h.id %>" class="text-ink2 hover:text-ink"><i class="fa-regular fa-eye"></i></button>
+                          <button data-copy="<%= h.credentials.site_user_pass || '' %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="rounded-xl bg-card border border-border p-4">
+                      <div class="font-display font-semibold text-ink mb-2"><i class="fa-solid fa-database text-primary2"></i> Database (MySQL)</div>
+                      <div class="space-y-2 text-ink2">
+                        <div>Host: <span class="text-ink"><%= h.credentials.db_host %></span></div>
+                        <div>Port: <span class="text-ink"><%= h.credentials.db_port %></span></div>
+                        <div class="flex items-center gap-2">
+                          <span>DB:</span>
+                          <span class="text-ink font-mono"><%= h.credentials.db_name %></span>
+                          <button data-copy="<%= h.credentials.db_name %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span>User:</span>
+                          <span class="text-ink font-mono"><%= h.credentials.db_user %></span>
+                          <button data-copy="<%= h.credentials.db_user %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span>Password:</span>
+                          <input id="db-pass-<%= h.id %>" type="password" readonly value="<%= h.credentials.db_pass %>" class="bg-card border border-border rounded px-2 py-1 text-ink font-mono w-40" />
+                          <button type="button" data-toggle-pass="db-pass-<%= h.id %>" class="text-ink2 hover:text-ink"><i class="fa-regular fa-eye"></i></button>
+                          <button data-copy="<%= h.credentials.db_pass %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="rounded-xl bg-card border border-border p-4 md:col-span-2">
+                      <div class="font-display font-semibold text-ink mb-2"><i class="fa-solid fa-globe text-primary2"></i> Nameserver (Arahkan domain)</div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-ink2">
+                        <div class="flex items-center gap-2">NS1: <span class="text-ink font-mono"><%= h.credentials.nameserver1 %></span><button data-copy="<%= h.credentials.nameserver1 %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button></div>
+                        <div class="flex items-center gap-2">NS2: <span class="text-ink font-mono"><%= h.credentials.nameserver2 %></span><button data-copy="<%= h.credentials.nameserver2 %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button></div>
+                      </div>
+                    </div>
+
+                    <div class="rounded-xl bg-card border border-border p-4 md:col-span-2 flex items-center gap-3">
+                      <i class="fa-solid fa-shield-halved text-emerald text-lg"></i>
+                      <div class="text-sm">SSL <span class="text-emerald font-semibold">Aktif</span> (Let's Encrypt)</div>
+                    </div>
+                  </div>
+                </details>
+              <% } else if (h.status === 'pending') { %>
+                <div class="mt-5 rounded-xl border border-border bg-card2 px-5 py-4 text-sm text-ink2">
+                  <i class="fa-solid fa-hourglass-half text-gold"></i> Menunggu pembayaran. Info akses akan tersedia setelah pembayaran sukses.
+                </div>
+              <% } else if (h.status === 'provision_failed') { %>
+                <div class="mt-5 rounded-xl border border-danger/40 bg-danger/10 px-5 py-4 text-sm text-danger">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Provisioning gagal — admin akan men-retry. Silakan hubungi support.
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+</body>
+</html>

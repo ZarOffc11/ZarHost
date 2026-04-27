@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title><%= typeof title !== 'undefined' ? title : 'Hosting' %> · <%= brand %></title>
+<meta name="description" content="<%= brand %> - Layanan hosting cepat, aman, dan terpercaya berbasis CloudPanel dengan provisioning otomatis." />
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS Play CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Poppins', 'system-ui', 'sans-serif'],
+        body:    ['Inter',   'system-ui', 'sans-serif'],
+      },
+      colors: {
+        bg:      '#0A0A0F',
+        card:    '#111118',
+        card2:   '#16161F',
+        border:  '#2A2A3A',
+        primary: '#6C63FF',
+        primary2:'#A78BFA',
+        gold:    '#F59E0B',
+        emerald: '#10B981',
+        danger:  '#EF4444',
+        ink:     '#F1F5F9',
+        ink2:    '#94A3B8',
+        muted:   '#475569',
+      },
+      boxShadow: {
+        glow: '0 0 30px rgba(108, 99, 255, 0.30)',
+        glowHover: '0 0 50px rgba(108, 99, 255, 0.55)',
+      },
+      backgroundImage: {
+        brand: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
+      },
+      borderRadius: {
+        '2xl': '1rem',
+      },
+    },
+  },
+};
+</script>
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<!-- AOS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- tsParticles -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+
+<link rel="stylesheet" href="/static/css/custom.css" />
+</head>

@@ -1,0 +1,101 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_admin') %>
+
+    <div class="flex-1 space-y-5 max-w-3xl">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
+        <h1 class="font-display font-extrabold text-2xl">Konfigurasi VPS CloudPanel</h1>
+        <p class="text-ink2 text-sm mt-1">Setting SSH ke VPS yang sudah terinstall CloudPanel. Provisioning otomatis akan menggunakan kredensial ini.</p>
+      </div>
+
+      <form id="vps-form" method="POST" action="/admin/vps-config" data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-ink2 uppercase">VPS Host / IP</label>
+          <input id="vps-host" name="host" required value="<%= cfg.host %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="1.2.3.4" />
+        </div>
+        <div>
+          <label class="text-xs text-ink2 uppercase">SSH Port</label>
+          <input id="vps-port" name="port" type="number" min="1" value="<%= cfg.port %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs text-ink2 uppercase">SSH User</label>
+          <input id="vps-user" name="user" required value="<%= cfg.user %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs text-ink2 uppercase">SSH Password</label>
+          <div class="mt-1 flex items-center rounded-xl bg-card2 border border-border focus-within:border-primary transition">
+            <input id="vps-password" name="password" type="password" placeholder="<%= cfg.has_password ? '•••••••• (sudah tersimpan)' : 'Password SSH' %>"
+                   class="flex-1 bg-transparent px-4 py-2 text-sm focus:outline-none" />
+            <button type="button" data-toggle-pass="vps-password" class="px-3 text-ink2 hover:text-ink"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <p class="text-xs text-ink2 mt-1">Kosongkan untuk tetap menggunakan password sebelumnya.</p>
+        </div>
+        <div>
+          <label class="text-xs text-ink2 uppercase">Nameserver 1</label>
+          <input name="ns1" value="<%= cfg.ns1 %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="ns1.zarhost.id" />
+        </div>
+        <div>
+          <label class="text-xs text-ink2 uppercase">Nameserver 2</label>
+          <input name="ns2" value="<%= cfg.ns2 %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="ns2.zarhost.id" />
+        </div>
+
+        <div class="md:col-span-2 flex gap-3 justify-end">
+          <button type="button" id="test-btn" class="px-5 py-2 rounded-full border border-primary/60 text-primary2 hover:bg-primary/10 text-sm">
+            <i class="fa-solid fa-plug mr-1"></i> Test Koneksi
+          </button>
+          <button class="px-6 py-2 rounded-full bg-brand text-white text-sm font-semibold shadow-glow hover:shadow-glowHover transition">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+<script>
+  document.getElementById('test-btn').addEventListener('click', function () {
+    var payload = {
+      host: document.getElementById('vps-host').value,
+      port: document.getElementById('vps-port').value,
+      user: document.getElementById('vps-user').value,
+      password: document.getElementById('vps-password').value,
+    };
+    Swal.fire({
+      title: 'Menguji koneksi...',
+      html: 'SSH ke <code>' + (payload.host || '?') + '</code>',
+      background: '#16161F', color: '#F1F5F9',
+      didOpen: function () { Swal.showLoading(); },
+      allowOutsideClick: false,
+    });
+    fetch('/admin/api/test-vps', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      Swal.fire({
+        icon: j.ok ? 'success' : 'error',
+        title: j.ok ? 'CloudPanel terdeteksi!' : 'Tidak dapat terhubung',
+        html: '<div class="text-sm">' + (j.message || '').replace(/</g,'&lt;') + '</div>' + (j.version ? '<div class="text-xs mt-2">Versi: ' + j.version + '</div>' : ''),
+        background: '#16161F', color: '#F1F5F9',
+        confirmButtonColor: '#6C63FF',
+      });
+    })
+    .catch(function(err){
+      Swal.fire({
+        icon: 'error', title: 'Error', text: err.message,
+        background: '#16161F', color: '#F1F5F9', confirmButtonColor: '#6C63FF',
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+/* ZarHost custom styles */
+html, body {
+  background-color: #0A0A0F;
+  color: #F1F5F9;
+  font-family: 'Inter', system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+h1, h2, h3, h4, h5 { font-family: 'Poppins', system-ui, sans-serif; }
+
+/* Particle container */
+#tsparticles {
+  position: absolute; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* Hide arrows on number inputs */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+/* Smooth card hover */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: #6C63FF;
+  box-shadow: 0 0 50px rgba(108, 99, 255, 0.30);
+}
+
+/* Pricing badge */
+.pop-badge {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  color: #0A0A0F;
+  font-weight: 700;
+}
+
+/* Glow text */
+.glow-text {
+  background: linear-gradient(135deg, #6C63FF, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0A0A0F; }
+::-webkit-scrollbar-thumb { background: #2A2A3A; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #6C63FF; }
+
+/* FAQ accordion */
+details.faq summary { list-style: none; cursor: pointer; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq[open] .faq-icon { transform: rotate(180deg); }
+.faq-icon { transition: transform 0.25s ease; }
+
+/* Status badges */
+.badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; border: 1px solid transparent; }
+.badge-success  { background: rgba(16, 185, 129, 0.15); color: #34D399; border-color: rgba(16, 185, 129, 0.4); }
+.badge-pending  { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border-color: rgba(245, 158, 11, 0.4); }
+.badge-danger   { background: rgba(239,  68,  68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.4); }
+.badge-muted    { background: rgba(148, 163, 184, 0.10); color: #94A3B8; border-color: rgba(148, 163, 184, 0.3); }
+.badge-info     { background: rgba(108,  99, 255, 0.15); color: #A78BFA; border-color: rgba(108, 99, 255, 0.4); }

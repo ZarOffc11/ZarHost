@@ -1,0 +1,24 @@
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({ duration: 800, once: true, offset: 60 });</script>
+<script>
+  // Flash via SweetAlert2 (server-rendered)
+  (function () {
+    var flashEl = document.getElementById('__flash');
+    if (!flashEl) return;
+    var type = flashEl.dataset.type || 'info';
+    var message = flashEl.dataset.message || '';
+    if (!message) return;
+    var iconMap = { success: 'success', error: 'error', info: 'info', warn: 'warning' };
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: iconMap[type] || 'info',
+      title: message,
+      showConfirmButton: false,
+      timer: 3500,
+      background: '#16161F',
+      color: '#F1F5F9',
+    });
+  })();
+</script>
+<script src="/static/js/main.js"></script>

@@ -1,0 +1,25 @@
+<aside class="lg:sticky lg:top-20 self-start lg:w-64 w-full shrink-0">
+  <div class="rounded-2xl border border-border bg-card p-4">
+    <div class="flex items-center gap-3 px-2 py-3 mb-3 border-b border-border">
+      <div class="w-10 h-10 rounded-full bg-brand grid place-items-center text-white font-display font-bold">
+        <%= (currentUser.name || 'U').slice(0,1).toUpperCase() %>
+      </div>
+      <div class="min-w-0">
+        <div class="font-display font-semibold text-ink truncate"><%= currentUser.name %></div>
+        <div class="text-xs text-ink2 truncate"><%= currentUser.email %></div>
+      </div>
+    </div>
+    <nav class="space-y-1 text-sm">
+      <a href="/dashboard"          class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='home'    ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-house w-4"></i> Dashboard</a>
+      <a href="/dashboard/hosting"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='hosting' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-globe w-4"></i> Hosting Saya</a>
+      <a href="/dashboard/history"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='history' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-clock-rotate-left w-4"></i> Riwayat Transaksi</a>
+      <a href="/dashboard/profile"  class="flex items-center gap-3 px-3 py-2 rounded-xl <%= activeMenu==='profile' ? 'bg-brand text-white shadow-glow' : 'text-ink2 hover:text-ink hover:bg-card2' %>"><i class="fa-solid fa-user w-4"></i> Profil</a>
+      <% if (currentUser.role === 'admin') { %>
+        <a href="/admin" class="flex items-center gap-3 px-3 py-2 rounded-xl text-gold hover:bg-card2"><i class="fa-solid fa-shield-halved w-4"></i> Admin Panel</a>
+      <% } %>
+      <form method="POST" action="/auth/logout">
+        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-ink2 hover:text-danger hover:bg-card2"><i class="fa-solid fa-right-from-bracket w-4"></i> Keluar</button>
+      </form>
+    </nav>
+  </div>
+</aside>

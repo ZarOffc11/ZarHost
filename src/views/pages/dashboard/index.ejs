@@ -1,0 +1,110 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_user') %>
+
+    <div class="flex-1 space-y-6">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
+        <h1 class="font-display font-extrabold text-2xl">Selamat datang, <%= currentUser.name %>!</h1>
+        <p class="text-ink2 text-sm mt-1">Ringkasan akun & aktivitas hosting Anda.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-5 card-hover">
+          <div class="flex items-center gap-3 text-ink2 text-sm">
+            <span class="w-9 h-9 grid place-items-center rounded-xl bg-emerald/15 text-emerald"><i class="fa-solid fa-circle-check"></i></span>
+            Hosting Aktif
+          </div>
+          <div class="mt-3 font-display font-extrabold text-3xl"><%= stats.active %></div>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="80" class="rounded-2xl border border-border bg-card p-5 card-hover">
+          <div class="flex items-center gap-3 text-ink2 text-sm">
+            <span class="w-9 h-9 grid place-items-center rounded-xl bg-danger/15 text-danger"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            Expired / Suspended
+          </div>
+          <div class="mt-3 font-display font-extrabold text-3xl"><%= stats.expired %></div>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="160" class="rounded-2xl border border-border bg-card p-5 card-hover">
+          <div class="flex items-center gap-3 text-ink2 text-sm">
+            <span class="w-9 h-9 grid place-items-center rounded-xl bg-primary/15 text-primary2"><i class="fa-solid fa-receipt"></i></span>
+            Total Transaksi
+          </div>
+          <div class="mt-3 font-display font-extrabold text-3xl"><%= stats.transactions %></div>
+        </div>
+      </div>
+
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+          <h2 class="font-display font-bold text-lg">Hosting Anda</h2>
+          <a href="/dashboard/hosting" class="text-sm text-primary2 hover:underline">Lihat semua</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs text-ink2 uppercase">
+              <tr><th class="px-5 py-3">Domain</th><th class="px-5 py-3">Paket</th><th class="px-5 py-3">Expired</th><th class="px-5 py-3">Status</th><th class="px-5 py-3 text-right">Aksi</th></tr>
+            </thead>
+            <tbody>
+              <% if (!hostings.length) { %>
+                <tr><td colspan="5" class="px-5 py-6 text-center text-ink2">Belum ada hosting. <a href="/pricing" class="text-primary2 hover:underline">Beli sekarang</a></td></tr>
+              <% } else { %>
+                <% hostings.forEach(function(h){ %>
+                  <tr class="border-t border-border">
+                    <td class="px-5 py-3 font-medium"><%= h.domain %></td>
+                    <td class="px-5 py-3 text-ink2"><%= h.package_name %></td>
+                    <td class="px-5 py-3 text-ink2"><%= h.expired_at ? new Date(h.expired_at).toLocaleDateString('id-ID') : '-' %></td>
+                    <td class="px-5 py-3"><%- include('../../partials/_status_badge', { status: h.status }) %></td>
+                    <td class="px-5 py-3 text-right">
+                      <% if (h.status === 'active' || h.status === 'expired') { %>
+                        <a href="/dashboard/renew/<%= h.id %>" class="inline-flex items-center gap-1 text-primary2 hover:underline text-sm"><i class="fa-solid fa-rotate-right"></i> Perpanjang</a>
+                      <% } else { %>
+                        <span class="text-muted text-xs">—</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+          <h2 class="font-display font-bold text-lg">5 Transaksi Terakhir</h2>
+          <a href="/dashboard/history" class="text-sm text-primary2 hover:underline">Lihat semua</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs text-ink2 uppercase">
+              <tr><th class="px-5 py-3">ID</th><th class="px-5 py-3">Tipe</th><th class="px-5 py-3">Paket</th><th class="px-5 py-3">Total</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Tgl</th></tr>
+            </thead>
+            <tbody>
+              <% if (!transactions.length) { %>
+                <tr><td colspan="6" class="px-5 py-6 text-center text-ink2">Belum ada transaksi.</td></tr>
+              <% } else { %>
+                <% transactions.forEach(function(t){ %>
+                  <tr class="border-t border-border">
+                    <td class="px-5 py-3 font-mono text-xs"><%= t.trx_id %></td>
+                    <td class="px-5 py-3"><span class="badge <%= t.type==='renew' ? 'badge-info' : 'badge-muted' %>"><%= t.type === 'renew' ? 'Renew' : 'Beli' %></span></td>
+                    <td class="px-5 py-3 text-ink2"><%= t.package_name %></td>
+                    <td class="px-5 py-3 font-medium"><%= formatIDR(t.total_amount) %></td>
+                    <td class="px-5 py-3"><%- include('../../partials/_trx_badge', { status: t.status }) %></td>
+                    <td class="px-5 py-3 text-ink2"><%= new Date(t.created_at).toLocaleString('id-ID') %></td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+</body>
+</html>

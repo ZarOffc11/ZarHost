@@ -1,0 +1,12 @@
+<%
+  var s = (status || '').toLowerCase();
+  var map = {
+    active: { cls: 'badge-success', icon: 'fa-circle-check', text: 'Aktif' },
+    expired: { cls: 'badge-danger', icon: 'fa-circle-xmark', text: 'Expired' },
+    suspended: { cls: 'badge-pending', icon: 'fa-pause', text: 'Suspended' },
+    pending: { cls: 'badge-muted', icon: 'fa-hourglass-half', text: 'Pending' },
+    provision_failed: { cls: 'badge-danger', icon: 'fa-triangle-exclamation', text: 'Provision Gagal' },
+    deleted: { cls: 'badge-muted', icon: 'fa-trash', text: 'Dihapus' },
+  };
+  var b = map[s] || { cls: 'badge-muted', icon: 'fa-circle', text: status || '-' };
+%><span class="badge <%= b.cls %>"><i class="fa-solid <%= b.icon %>"></i> <%= b.text %></span>

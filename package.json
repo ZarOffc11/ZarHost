@@ -1,0 +1,38 @@
+{
+  "name": "zarhost",
+  "version": "1.0.0",
+  "description": "ZarHost - Website jual layanan hosting CloudPanel dengan provisioning otomatis via cloudpanel-sdk dan pembayaran QRIS.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "hosting",
+    "cloudpanel",
+    "express",
+    "qris",
+    "sqlite"
+  ],
+  "author": "ZarOffc",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.5.0",
+    "better-sqlite3-session-store": "^0.1.0",
+    "cloudpanel-sdk": "^1.0.0",
+    "dotenv": "^16.4.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "node-cron": "^3.0.3",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.0"
+  }
+}

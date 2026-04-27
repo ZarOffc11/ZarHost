@@ -1,0 +1,150 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 mb-5 flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="font-display font-extrabold text-2xl">Pembayaran QRIS</h1>
+      <p class="text-ink2 text-sm mt-1">Scan QR di bawah dengan aplikasi e-wallet apa pun (GoPay/OVO/Dana/QRIS).</p>
+    </div>
+    <span id="status-badge" class="badge badge-pending"><i class="fa-solid fa-hourglass-half"></i> <span id="status-text">Menunggu Pembayaran</span></span>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 text-center">
+      <% if (qrDataUrl) { %>
+        <div class="bg-white inline-block p-3 rounded-xl shadow-glow">
+          <img src="<%= qrDataUrl %>" alt="QRIS" class="w-72 h-72 mx-auto" />
+        </div>
+      <% } else { %>
+        <div class="text-ink2">Tidak dapat memuat QR.</div>
+      <% } %>
+      <div class="mt-4 text-sm text-ink2">Bayar dalam:</div>
+      <div id="countdown" class="font-display font-extrabold text-3xl mt-1 glow-text">--:--</div>
+      <div class="mt-3 text-xs text-ink2">ID Transaksi:</div>
+      <div class="font-mono text-sm text-ink"><%= trx.trx_id %></div>
+    </div>
+
+    <div data-aos="fade-up" data-aos-delay="80" class="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <h2 class="font-display font-bold text-lg">Ringkasan Pesanan</h2>
+      <div class="rounded-xl bg-card2 border border-border p-4 text-sm space-y-2">
+        <div class="flex justify-between"><span class="text-ink2">Tipe</span><span><%= trx.type === 'renew' ? 'Perpanjang' : 'Beli Baru' %></span></div>
+        <div class="flex justify-between"><span class="text-ink2">Paket</span><span><%= trx.package_name %></span></div>
+        <div class="flex justify-between"><span class="text-ink2">Domain</span><span class="font-mono text-xs"><%= trx.domain || '-' %></span></div>
+        <div class="flex justify-between"><span class="text-ink2">Durasi</span><span><%= trx.duration_months %> bulan</span></div>
+      </div>
+      <div class="rounded-xl bg-card2 border border-border p-4 text-sm space-y-2">
+        <div class="flex justify-between"><span class="text-ink2">Subtotal</span><span><%= formatIDR(trx.base_amount) %></span></div>
+        <div class="flex justify-between"><span class="text-ink2">PPN 11%</span><span><%= formatIDR(trx.ppn_amount) %></span></div>
+        <% if (trx.fee || trx.unique_code) { %>
+          <div class="flex justify-between"><span class="text-ink2">Fee + Kode Unik</span><span><%= formatIDR((trx.fee||0) + (trx.unique_code||0)) %></span></div>
+        <% } %>
+        <div class="border-t border-border my-1"></div>
+        <div class="flex justify-between font-display font-bold"><span>Total Transfer</span><span class="glow-text"><%= formatIDR(trx.total_amount) %></span></div>
+      </div>
+
+      <form method="POST" action="/payment/cancel/<%= trx.trx_id %>" id="cancel-form">
+        <button type="button" id="cancel-btn" class="w-full px-5 py-3 rounded-full border border-danger/60 text-danger hover:bg-danger/10 transition text-sm">
+          <i class="fa-solid fa-xmark mr-1"></i> Batalkan Pembayaran
+        </button>
+      </form>
+      <a href="/dashboard" class="block w-full text-center text-ink2 text-xs hover:text-ink mt-2">Kembali ke Dashboard</a>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+<script>
+  (function () {
+    var trxId = "<%= trx.trx_id %>";
+    var expiry = <%= trx.expiry || 'null' %>;
+    var statusEl = document.getElementById('status-text');
+    var badgeEl = document.getElementById('status-badge');
+    var cdEl = document.getElementById('countdown');
+    var pollTimer = null, cdTimer = null, finished = false;
+
+    function setBadge(state) {
+      badgeEl.classList.remove('badge-pending','badge-success','badge-danger','badge-muted');
+      var icon = badgeEl.querySelector('i');
+      if (state === 'SUCCESS') { badgeEl.classList.add('badge-success'); icon.className = 'fa-solid fa-circle-check'; statusEl.textContent = 'Pembayaran Sukses'; }
+      else if (state === 'EXPIRED') { badgeEl.classList.add('badge-muted'); icon.className = 'fa-solid fa-clock'; statusEl.textContent = 'Kadaluarsa'; }
+      else if (state === 'CANCELED') { badgeEl.classList.add('badge-danger'); icon.className = 'fa-solid fa-ban'; statusEl.textContent = 'Dibatalkan'; }
+      else { badgeEl.classList.add('badge-pending'); icon.className = 'fa-solid fa-hourglass-half'; statusEl.textContent = 'Menunggu Pembayaran'; }
+    }
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function tickCountdown() {
+      if (!expiry) return;
+      var ms = expiry - Date.now();
+      if (ms <= 0) { cdEl.textContent = '00:00'; clearInterval(cdTimer); return; }
+      var s = Math.floor(ms / 1000);
+      var m = Math.floor(s / 60);
+      s = s % 60;
+      var h = Math.floor(m / 60);
+      m = m % 60;
+      cdEl.textContent = (h > 0 ? pad(h) + ':' : '') + pad(m) + ':' + pad(s);
+    }
+
+    function poll() {
+      fetch('/api/payment/status/' + encodeURIComponent(trxId), { credentials: 'same-origin' })
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          if (!j || finished) return;
+          setBadge(j.status);
+          if (j.status === 'SUCCESS') {
+            finished = true;
+            clearInterval(pollTimer);
+            Swal.fire({
+              icon: 'success',
+              title: 'Pembayaran Sukses!',
+              html: 'Hosting <b>' + (j.domain || '') + '</b> sedang di-provisioning ke server.',
+              background: '#16161F', color: '#F1F5F9',
+              confirmButtonText: 'Ke Dashboard',
+              confirmButtonColor: '#6C63FF',
+            }).then(function(){ window.location.href = '/dashboard/hosting'; });
+          } else if (j.status === 'EXPIRED' || j.status === 'CANCELED') {
+            finished = true;
+            clearInterval(pollTimer);
+            Swal.fire({
+              icon: j.status === 'EXPIRED' ? 'warning' : 'error',
+              title: j.status === 'EXPIRED' ? 'Pembayaran Kadaluarsa' : 'Pembayaran Dibatalkan',
+              text: j.status === 'EXPIRED' ? 'Silakan beli ulang.' : 'Pembayaran berhasil dibatalkan.',
+              background: '#16161F', color: '#F1F5F9',
+              confirmButtonColor: '#6C63FF',
+            }).then(function(){ window.location.href = '/dashboard'; });
+          }
+        })
+        .catch(function(){});
+    }
+
+    setBadge('<%= trx.status %>');
+    if ('<%= trx.status %>' === 'PENDING') {
+      pollTimer = setInterval(poll, 5000);
+      poll();
+      if (expiry) {
+        tickCountdown();
+        cdTimer = setInterval(tickCountdown, 1000);
+      } else {
+        cdEl.textContent = '—';
+      }
+    } else {
+      cdEl.textContent = '—';
+    }
+
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+      Swal.fire({
+        icon: 'question', title: 'Batalkan pembayaran?',
+        showCancelButton: true, confirmButtonText: 'Ya, Batalkan',
+        cancelButtonText: 'Tidak', confirmButtonColor: '#EF4444',
+        background: '#16161F', color: '#F1F5F9',
+      }).then(function(r){
+        if (r.isConfirmed) document.getElementById('cancel-form').submit();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

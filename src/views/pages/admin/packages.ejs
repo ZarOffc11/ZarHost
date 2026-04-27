@@ -1,0 +1,116 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_admin') %>
+
+    <div class="flex-1 space-y-5">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 class="font-display font-extrabold text-2xl">Manajemen Paket</h1>
+          <p class="text-ink2 text-sm mt-1">Tambah, edit, dan kelola paket hosting.</p>
+        </div>
+        <a href="/admin/packages/new" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand text-white text-sm shadow-glow hover:shadow-glowHover transition">
+          <i class="fa-solid fa-plus"></i> Tambah Paket
+        </a>
+      </div>
+
+      <% if (editing) { %>
+        <% var isNew = !editing.id; %>
+        <% if (errors && errors.length) { %>
+          <div class="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+            <ul class="list-disc pl-4 space-y-1">
+              <% errors.forEach(function(e){ %><li><%= e.msg %></li><% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <form method="POST" action="<%= isNew ? '/admin/packages' : '/admin/packages/'+editing.id %>"
+              data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-ink2 uppercase">Nama Paket</label>
+            <input name="name" required value="<%= formData.name || '' %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase">Harga / Bulan (IDR)</label>
+            <input name="price_monthly" type="number" min="1000" required value="<%= formData.price_monthly || '' %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-xs text-ink2 uppercase">Deskripsi</label>
+            <input name="description" value="<%= formData.description || '' %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase">Disk (GB)</label>
+            <input name="disk_gb" type="number" min="1" required value="<%= formData.disk_gb || '' %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase">Bandwidth (GB)</label>
+            <input name="bandwidth_gb" type="number" min="1" required value="<%= formData.bandwidth_gb || '' %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-ink2 uppercase">Max Sites</label>
+            <input name="max_sites" type="number" min="1" required value="<%= formData.max_sites || 1 %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+          </div>
+          <div class="flex flex-wrap gap-4 items-center md:col-span-2">
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="ssl" value="1" <%= formData.ssl ? 'checked' : '' %> class="rounded bg-card2 border-border text-primary focus:ring-primary" /> SSL Gratis</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="backup" value="1" <%= formData.backup ? 'checked' : '' %> class="rounded bg-card2 border-border text-primary focus:ring-primary" /> Backup Otomatis</label>
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_active" value="1" <%= formData.is_active ? 'checked' : '' %> class="rounded bg-card2 border-border text-primary focus:ring-primary" /> Aktif</label>
+          </div>
+          <div class="md:col-span-2 flex gap-3 justify-end">
+            <a href="/admin/packages" class="px-5 py-2 rounded-full border border-border text-ink2 hover:text-ink hover:bg-card2 text-sm">Batal</a>
+            <button class="px-6 py-2 rounded-full bg-brand text-white text-sm font-semibold shadow-glow hover:shadow-glowHover transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan
+            </button>
+          </div>
+        </form>
+      <% } %>
+
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs text-ink2 uppercase">
+              <tr>
+                <th class="px-5 py-3">Paket</th>
+                <th class="px-5 py-3">Harga / Bln</th>
+                <th class="px-5 py-3">Disk</th>
+                <th class="px-5 py-3">Bandwidth</th>
+                <th class="px-5 py-3">Site</th>
+                <th class="px-5 py-3">Status</th>
+                <th class="px-5 py-3 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% packages.forEach(function(p){ %>
+                <tr class="border-t border-border">
+                  <td class="px-5 py-3 font-medium"><%= p.name %><div class="text-xs text-ink2"><%= p.description || '' %></div></td>
+                  <td class="px-5 py-3"><%= formatIDR(p.price_monthly) %></td>
+                  <td class="px-5 py-3 text-ink2"><%= p.disk_gb %> GB</td>
+                  <td class="px-5 py-3 text-ink2"><%= p.bandwidth_gb %> GB</td>
+                  <td class="px-5 py-3 text-ink2"><%= p.max_sites %></td>
+                  <td class="px-5 py-3">
+                    <% if (p.is_active) { %><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                    <% } else { %><span class="badge badge-muted">Nonaktif</span><% } %>
+                  </td>
+                  <td class="px-5 py-3 text-right space-x-2 whitespace-nowrap">
+                    <a href="/admin/packages/<%= p.id %>/edit" class="text-primary2 hover:underline text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+                    <% if (p.is_active) { %>
+                      <form method="POST" action="/admin/packages/<%= p.id %>/delete" class="inline" onsubmit="return confirm('Nonaktifkan paket ini?')">
+                        <button class="text-danger hover:underline text-xs"><i class="fa-solid fa-power-off"></i> Nonaktifkan</button>
+                      </form>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+</body>
+</html>

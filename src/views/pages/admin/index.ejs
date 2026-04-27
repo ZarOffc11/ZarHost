@@ -1,0 +1,106 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_admin') %>
+
+    <div class="flex-1 space-y-5">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
+        <h1 class="font-display font-extrabold text-2xl">Admin Dashboard</h1>
+        <p class="text-ink2 text-sm mt-1">Ringkasan operasional <%= brand %>.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <% var cards = [
+          { icon:'fa-users', cls:'text-primary2 bg-primary/15', label:'Total User', value: stats.users },
+          { icon:'fa-receipt', cls:'text-gold bg-gold/15', label:'Total Transaksi', value: stats.transactions },
+          { icon:'fa-coins', cls:'text-emerald bg-emerald/15', label:'Revenue Bulan Ini', value: formatIDR(stats.revenue) },
+          { icon:'fa-server', cls:'text-primary2 bg-primary/15', label:'Hosting Aktif', value: stats.hostingActive }
+        ]; %>
+        <% cards.forEach(function(c, i){ %>
+          <div data-aos="fade-up" data-aos-delay="<%= i*60 %>" class="rounded-2xl border border-border bg-card p-5 card-hover">
+            <div class="flex items-center gap-3 text-ink2 text-sm">
+              <span class="w-9 h-9 grid place-items-center rounded-xl <%= c.cls %>"><i class="fa-solid <%= c.icon %>"></i></span>
+              <%= c.label %>
+            </div>
+            <div class="mt-3 font-display font-extrabold text-2xl"><%= c.value %></div>
+          </div>
+        <% }) %>
+      </div>
+
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
+        <h2 class="font-display font-bold text-lg mb-4">Revenue 6 Bulan Terakhir</h2>
+        <canvas id="revChart" height="80"></canvas>
+      </div>
+
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+          <h2 class="font-display font-bold text-lg">10 Transaksi Terakhir</h2>
+          <a href="/admin/transactions" class="text-sm text-primary2 hover:underline">Lihat semua</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs text-ink2 uppercase">
+              <tr><th class="px-5 py-3">ID</th><th class="px-5 py-3">User</th><th class="px-5 py-3">Paket</th><th class="px-5 py-3">Total</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Tgl</th></tr>
+            </thead>
+            <tbody>
+              <% if (!recentTx.length) { %>
+                <tr><td colspan="6" class="px-5 py-6 text-center text-ink2">Belum ada transaksi.</td></tr>
+              <% } else { %>
+                <% recentTx.forEach(function(t){ %>
+                  <tr class="border-t border-border">
+                    <td class="px-5 py-3 font-mono text-xs"><%= t.trx_id %></td>
+                    <td class="px-5 py-3 text-ink2"><%= t.user_name %><div class="text-xs"><%= t.user_email %></div></td>
+                    <td class="px-5 py-3 text-ink2"><%= t.package_name %></td>
+                    <td class="px-5 py-3 font-medium"><%= formatIDR(t.total_amount) %></td>
+                    <td class="px-5 py-3"><%- include('../../partials/_trx_badge', { status: t.status }) %></td>
+                    <td class="px-5 py-3 text-ink2 whitespace-nowrap"><%= new Date(t.created_at).toLocaleString('id-ID') %></td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+<script>
+  var months = <%- JSON.stringify(months) %>;
+  var ctx = document.getElementById('revChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months.map(function(m){ return m.label; }),
+      datasets: [{
+        label: 'Revenue',
+        data: months.map(function(m){ return m.revenue; }),
+        borderColor: '#A78BFA',
+        backgroundColor: 'rgba(108, 99, 255, 0.18)',
+        tension: 0.4,
+        fill: true,
+        borderWidth: 2,
+        pointBackgroundColor: '#6C63FF',
+        pointBorderColor: '#fff',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { labels: { color: '#94A3B8' } },
+        tooltip: { callbacks: { label: function(c){ return ZH.formatIDR(c.parsed.y); } } }
+      },
+      scales: {
+        x: { ticks: { color: '#94A3B8' }, grid: { color: '#1F1F2A' } },
+        y: { ticks: { color: '#94A3B8', callback: function(v){ return ZH.formatIDR(v); } }, grid: { color: '#1F1F2A' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>

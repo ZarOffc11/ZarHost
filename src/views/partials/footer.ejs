@@ -1,0 +1,41 @@
+<footer class="mt-24 border-t border-border bg-card/40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="col-span-2">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-9 h-9 rounded-xl bg-brand grid place-items-center shadow-glow">
+          <i class="fa-solid fa-cube text-white text-base"></i>
+        </span>
+        <span class="font-display font-extrabold text-xl text-ink"><%= brand %></span>
+      </div>
+      <p class="text-sm text-ink2 max-w-md leading-relaxed">
+        Hosting cepat, aman, terpercaya. Provisioning otomatis lewat CloudPanel —
+        beli paket, bayar QRIS, langsung aktif tanpa antri.
+      </p>
+      <div class="flex gap-3 mt-4">
+        <a href="#" class="w-10 h-10 grid place-items-center rounded-full bg-card border border-border text-ink2 hover:text-primary2 hover:border-primary2 transition"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="w-10 h-10 grid place-items-center rounded-full bg-card border border-border text-ink2 hover:text-primary2 hover:border-primary2 transition"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" class="w-10 h-10 grid place-items-center rounded-full bg-card border border-border text-ink2 hover:text-primary2 hover:border-primary2 transition"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" class="w-10 h-10 grid place-items-center rounded-full bg-card border border-border text-ink2 hover:text-primary2 hover:border-primary2 transition"><i class="fa-brands fa-github"></i></a>
+      </div>
+    </div>
+    <div>
+      <h4 class="font-display font-semibold text-ink mb-3">Produk</h4>
+      <ul class="space-y-2 text-sm text-ink2">
+        <li><a class="hover:text-ink" href="/pricing">Paket Hosting</a></li>
+        <li><a class="hover:text-ink" href="/#fitur">Fitur</a></li>
+        <li><a class="hover:text-ink" href="/#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-display font-semibold text-ink mb-3">Akun</h4>
+      <ul class="space-y-2 text-sm text-ink2">
+        <li><a class="hover:text-ink" href="/auth/register">Daftar</a></li>
+        <li><a class="hover:text-ink" href="/auth/login">Masuk</a></li>
+        <li><a class="hover:text-ink" href="/dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-border py-5 text-center text-xs text-muted">
+    © <%= year %> <%= brand %>. Semua hak dilindungi.
+  </div>
+</footer>

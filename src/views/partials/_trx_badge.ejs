@@ -1,0 +1,10 @@
+<%
+  var s = (status || '').toUpperCase();
+  var map = {
+    SUCCESS: { cls: 'badge-success', icon: 'fa-circle-check', text: 'Sukses' },
+    PENDING: { cls: 'badge-pending', icon: 'fa-hourglass-half', text: 'Menunggu' },
+    EXPIRED: { cls: 'badge-muted', icon: 'fa-clock', text: 'Expired' },
+    CANCELED: { cls: 'badge-danger', icon: 'fa-ban', text: 'Dibatalkan' },
+  };
+  var b = map[s] || { cls: 'badge-muted', icon: 'fa-circle', text: status || '-' };
+%><span class="badge <%= b.cls %>"><i class="fa-solid <%= b.icon %>"></i> <%= b.text %></span>

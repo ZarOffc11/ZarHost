@@ -1,0 +1,79 @@
+<%- include('../../partials/head') %>
+<body class="bg-bg text-ink font-body min-h-screen">
+<%- include('../../partials/alert') %>
+<%- include('../../partials/navbar') %>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-6">
+    <%- include('../../partials/sidebar_user') %>
+
+    <div class="flex-1 space-y-5">
+      <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6">
+        <h1 class="font-display font-extrabold text-2xl">Perpanjang Hosting</h1>
+        <p class="text-ink2 text-sm mt-1">Pilih durasi perpanjangan untuk <span class="text-ink font-semibold"><%= hosting.domain %></span>.</p>
+      </div>
+
+      <form data-aos="fade-up" method="POST" action="/payment/renew/<%= hosting.id %>" class="rounded-2xl border border-border bg-card p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl bg-card2 border border-border p-4">
+            <div class="text-ink2 text-xs uppercase">Domain</div>
+            <div class="font-display font-semibold text-ink mt-1"><%= hosting.domain %></div>
+          </div>
+          <div class="rounded-xl bg-card2 border border-border p-4">
+            <div class="text-ink2 text-xs uppercase">Paket</div>
+            <div class="font-display font-semibold text-ink mt-1"><%= hosting.package_name %> · <%= formatIDR(hosting.price_monthly) %>/bulan</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-ink2 text-xs uppercase mb-2">Durasi</div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <% [1,3,6,12].forEach(function(m, i){ %>
+              <label class="cursor-pointer">
+                <input type="radio" name="duration" value="<%= m %>" class="hidden peer dur-radio" <%= i===0 ? 'checked' : '' %> />
+                <div class="px-4 py-3 rounded-xl border border-border bg-card2 text-center text-sm peer-checked:bg-brand peer-checked:text-white peer-checked:shadow-glow peer-checked:border-primary transition">
+                  <div class="font-display font-semibold"><%= m %> Bulan</div>
+                </div>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-card2 border border-border p-5 text-sm">
+          <div class="flex justify-between py-1"><span class="text-ink2">Harga Paket</span><span><%= formatIDR(hosting.price_monthly) %> /bln</span></div>
+          <div class="flex justify-between py-1"><span class="text-ink2">Durasi</span><span id="dur-text">1 bulan</span></div>
+          <div class="flex justify-between py-1"><span class="text-ink2">Subtotal</span><span id="subtotal-text"><%= formatIDR(hosting.price_monthly) %></span></div>
+          <div class="flex justify-between py-1"><span class="text-ink2">PPN 11%</span><span id="ppn-text"><%= formatIDR(Math.ceil(hosting.price_monthly * 0.11)) %></span></div>
+          <div class="border-t border-border my-2"></div>
+          <div class="flex justify-between py-1 font-display font-bold text-lg"><span>Total Bayar</span><span class="glow-text" id="total-text"><%= formatIDR(hosting.price_monthly + Math.ceil(hosting.price_monthly * 0.11)) %></span></div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <a href="/dashboard/hosting" class="px-5 py-3 rounded-full border border-border text-ink2 hover:text-ink hover:bg-card2 text-sm">Batal</a>
+          <button class="px-6 py-3 rounded-full bg-brand text-white font-semibold shadow-glow hover:shadow-glowHover transition text-sm">
+            <i class="fa-solid fa-credit-card mr-1"></i> Lanjut Bayar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../../partials/scripts') %>
+<script>
+  var price = <%= hosting.price_monthly %>;
+  function recalc() {
+    var months = parseInt(document.querySelector('.dur-radio:checked')?.value || '1', 10);
+    var subtotal = price * months;
+    var ppn = Math.ceil(subtotal * 0.11);
+    var total = subtotal + ppn;
+    document.getElementById('dur-text').textContent = months + ' bulan';
+    document.getElementById('subtotal-text').textContent = ZH.formatIDR(subtotal);
+    document.getElementById('ppn-text').textContent = ZH.formatIDR(ppn);
+    document.getElementById('total-text').textContent = ZH.formatIDR(total);
+  }
+  document.querySelectorAll('.dur-radio').forEach(function(r){ r.addEventListener('change', recalc); });
+  recalc();
+</script>
+</body>
+</html>
