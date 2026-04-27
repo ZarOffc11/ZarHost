@@ -11,7 +11,7 @@
       <div data-aos="fade-up" class="rounded-2xl border border-border bg-card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h1 class="font-display font-extrabold text-2xl">Hosting Saya</h1>
-          <p class="text-ink2 text-sm mt-1">Kelola hosting & lihat info akses (SSH, DB, Nameserver).</p>
+          <p class="text-ink2 text-sm mt-1">Kelola hosting & lihat info akses (SSH, DB, A Record domain).</p>
         </div>
         <a href="/pricing" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand text-white shadow-glow hover:shadow-glowHover transition text-sm">
           <i class="fa-solid fa-plus"></i> Beli Hosting Baru
@@ -117,11 +117,41 @@
                     </div>
 
                     <div class="rounded-xl bg-card border border-border p-4 md:col-span-2">
-                      <div class="font-display font-semibold text-ink mb-2"><i class="fa-solid fa-globe text-primary2"></i> Nameserver (Arahkan domain)</div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-ink2">
-                        <div class="flex items-center gap-2">NS1: <span class="text-ink font-mono"><%= h.credentials.nameserver1 %></span><button data-copy="<%= h.credentials.nameserver1 %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button></div>
-                        <div class="flex items-center gap-2">NS2: <span class="text-ink font-mono"><%= h.credentials.nameserver2 %></span><button data-copy="<%= h.credentials.nameserver2 %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button></div>
+                      <div class="font-display font-semibold text-ink mb-2"><i class="fa-solid fa-globe text-primary2"></i> Arahkan Domain (A Record)</div>
+                      <p class="text-ink2 text-xs leading-relaxed mb-3">
+                        Login ke panel DNS registrar domain Anda (Cloudflare / Niagahoster / GoDaddy / dll), lalu buat <span class="text-ink font-semibold">A Record</span> berikut:
+                      </p>
+                      <div class="rounded-lg bg-bg/60 border border-border overflow-x-auto">
+                        <table class="w-full text-xs">
+                          <thead class="text-ink2">
+                            <tr><th class="px-3 py-2 text-left">Type</th><th class="px-3 py-2 text-left">Name / Host</th><th class="px-3 py-2 text-left">Value / Points to</th><th class="px-3 py-2 text-left">TTL</th></tr>
+                          </thead>
+                          <tbody class="text-ink">
+                            <tr class="border-t border-border">
+                              <td class="px-3 py-2 font-mono text-primary2">A</td>
+                              <td class="px-3 py-2 font-mono">@</td>
+                              <td class="px-3 py-2 font-mono flex items-center gap-2">
+                                <span><%= h.credentials.server_ip || '-' %></span>
+                                <button data-copy="<%= h.credentials.server_ip || '' %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                              </td>
+                              <td class="px-3 py-2 text-ink2">3600</td>
+                            </tr>
+                            <tr class="border-t border-border">
+                              <td class="px-3 py-2 font-mono text-primary2">A</td>
+                              <td class="px-3 py-2 font-mono">www</td>
+                              <td class="px-3 py-2 font-mono flex items-center gap-2">
+                                <span><%= h.credentials.server_ip || '-' %></span>
+                                <button data-copy="<%= h.credentials.server_ip || '' %>" class="text-primary2 hover:text-ink"><i class="fa-regular fa-copy"></i></button>
+                              </td>
+                              <td class="px-3 py-2 text-ink2">3600</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
+                      <p class="text-ink2 text-xs mt-3">
+                        <i class="fa-solid fa-circle-info text-primary2"></i>
+                        Domain biasanya aktif <span class="text-ink">5-30 menit</span> setelah A record diset (propagasi DNS). SSL akan otomatis ter-install setelah domain resolve.
+                      </p>
                     </div>
 
                     <div class="rounded-xl bg-card border border-border p-4 md:col-span-2 flex items-center gap-3">

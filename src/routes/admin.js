@@ -305,8 +305,7 @@ router.get('/vps-config', (req, res) => {
     user: getSetting('vps_user') || process.env.CLOUDPANEL_USER || 'root',
     port: getSetting('vps_port') || process.env.CLOUDPANEL_PORT || '22',
     has_password: !!(getSetting('vps_password') || process.env.CLOUDPANEL_PASSWORD),
-    ns1: getSetting('ns1') || process.env.NS1 || '',
-    ns2: getSetting('ns2') || process.env.NS2 || '',
+    server_ip: getSetting('server_ip') || process.env.SERVER_IP || '',
   };
   res.render('pages/admin/vps_config', {
     title: 'Konfigurasi VPS',
@@ -316,21 +315,19 @@ router.get('/vps-config', (req, res) => {
 });
 
 router.post('/vps-config', (req, res) => {
-  const { host, user, port, password, ns1, ns2 } = req.body;
+  const { host, user, port, password, server_ip } = req.body;
   if (host) setSetting('vps_host', host.trim());
   if (user) setSetting('vps_user', user.trim());
   if (port) setSetting('vps_port', String(parseInt(port, 10) || 22));
   if (password) setSetting('vps_password', password);
-  if (ns1) setSetting('ns1', ns1.trim());
-  if (ns2) setSetting('ns2', ns2.trim());
+  if (server_ip !== undefined) setSetting('server_ip', String(server_ip).trim());
 
   // also reflect in process.env so subsequent calls in this process pick them up
   if (host) process.env.CLOUDPANEL_HOST = host.trim();
   if (user) process.env.CLOUDPANEL_USER = user.trim();
   if (port) process.env.CLOUDPANEL_PORT = String(parseInt(port, 10) || 22);
   if (password) process.env.CLOUDPANEL_PASSWORD = password;
-  if (ns1) process.env.NS1 = ns1.trim();
-  if (ns2) process.env.NS2 = ns2.trim();
+  if (server_ip !== undefined) process.env.SERVER_IP = String(server_ip).trim();
 
   req.session.flash = { type: 'success', message: 'Konfigurasi VPS disimpan' };
   res.redirect('/admin/vps-config');

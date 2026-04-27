@@ -65,8 +65,7 @@ function migrate() {
       db_port         INTEGER DEFAULT 3306,
       ftp_host        TEXT,
       ftp_port        INTEGER DEFAULT 21,
-      nameserver1     TEXT,
-      nameserver2     TEXT,
+      server_ip       TEXT,
       created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -111,6 +110,13 @@ function migrate() {
     CREATE INDEX IF NOT EXISTS idx_transactions_trx   ON transactions(trx_id);
     CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
   `);
+
+  // Forward-migration: tabel lama mungkin masih punya kolom nameserver1/2.
+  // Tambahkan server_ip jika belum ada, biarkan kolom lama (tidak fatal).
+  const cols = db.prepare("PRAGMA table_info(hosting_credentials)").all().map((c) => c.name);
+  if (!cols.includes('server_ip')) {
+    db.exec("ALTER TABLE hosting_credentials ADD COLUMN server_ip TEXT");
+  }
 }
 
 function seed() {

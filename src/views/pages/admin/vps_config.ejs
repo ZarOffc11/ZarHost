@@ -35,13 +35,10 @@
           </div>
           <p class="text-xs text-ink2 mt-1">Kosongkan untuk tetap menggunakan password sebelumnya.</p>
         </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase">Nameserver 1</label>
-          <input name="ns1" value="<%= cfg.ns1 %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="ns1.zarhost.id" />
-        </div>
-        <div>
-          <label class="text-xs text-ink2 uppercase">Nameserver 2</label>
-          <input name="ns2" value="<%= cfg.ns2 %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="ns2.zarhost.id" />
+        <div class="md:col-span-2">
+          <label class="text-xs text-ink2 uppercase">Server IP (untuk A Record domain user)</label>
+          <input name="server_ip" value="<%= cfg.server_ip %>" class="mt-1 w-full rounded-xl bg-card2 border border-border px-4 py-2 text-sm focus:border-primary focus:outline-none" placeholder="kosongkan jika sama dengan VPS Host di atas" />
+          <p class="text-xs text-ink2 mt-1">User akan diminta mengarahkan A record domain ke IP ini. Kosongkan jika ingin menggunakan VPS Host di atas.</p>
         </div>
 
         <div class="md:col-span-2 flex gap-3 justify-end">

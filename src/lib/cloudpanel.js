@@ -95,8 +95,7 @@ async function checkCloudPanel(overrideConfig) {
 }
 
 async function provisionHosting(hosting, packageData) {
-  const ns1 = process.env.NS1 || 'ns1.zarhost.id';
-  const ns2 = process.env.NS2 || 'ns2.zarhost.id';
+  const serverIp = process.env.SERVER_IP || process.env.CLOUDPANEL_HOST || '';
   const ftpHost = process.env.CLOUDPANEL_HOST || '';
 
   const siteUser = sanitize(hosting.domain) + '_u';
@@ -115,8 +114,7 @@ async function provisionHosting(hosting, packageData) {
     db_port: 3306,
     ftp_host: ftpHost,
     ftp_port: 21,
-    nameserver1: ns1,
-    nameserver2: ns2,
+    server_ip: serverIp,
   };
 
   if (isSkipMode()) {
@@ -193,15 +191,15 @@ function saveCredentials(hostingId, c) {
   db.prepare(
     `INSERT INTO hosting_credentials (
       hosting_id, site_user, site_user_pass, db_name, db_user, db_pass,
-      db_host, db_port, ftp_host, ftp_port, nameserver1, nameserver2
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      db_host, db_port, ftp_host, ftp_port, server_ip
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     hostingId,
     c.site_user, c.site_user_pass,
     c.db_name, c.db_user, c.db_pass,
     c.db_host || 'localhost', c.db_port || 3306,
     c.ftp_host || '', c.ftp_port || 21,
-    c.nameserver1 || '', c.nameserver2 || ''
+    c.server_ip || ''
   );
 }
 

@@ -45,6 +45,18 @@
         <div class="flex justify-between font-display font-bold"><span>Total Transfer</span><span class="glow-text"><%= formatIDR(trx.total_amount) %></span></div>
       </div>
 
+      <% if (trx.type === 'new' && trx.domain && serverIp) { %>
+        <div class="rounded-xl bg-primary/10 border border-primary/40 p-4 text-xs text-ink2 leading-relaxed">
+          <div class="font-display font-semibold text-primary2 mb-2"><i class="fa-solid fa-circle-info"></i> Sambil menunggu pembayaran, arahkan domain Anda</div>
+          <p class="mb-2">Login ke panel DNS registrar domain <span class="text-ink font-mono"><%= trx.domain %></span> Anda lalu set <b>A Record</b>:</p>
+          <div class="rounded-lg bg-bg/60 border border-border p-2 font-mono text-[11px] text-ink space-y-1">
+            <div>A &nbsp; @ &nbsp; → &nbsp; <span class="text-primary2"><%= serverIp %></span> &nbsp; <button data-copy="<%= serverIp %>" class="text-primary2 hover:text-ink ml-1"><i class="fa-regular fa-copy"></i></button></div>
+            <div>A &nbsp; www &nbsp; → &nbsp; <span class="text-primary2"><%= serverIp %></span></div>
+          </div>
+          <p class="mt-2 text-[11px]">Domain aktif 5-30 menit setelah propagasi DNS. SSL terpasang otomatis setelah resolve.</p>
+        </div>
+      <% } %>
+
       <form method="POST" action="/payment/cancel/<%= trx.trx_id %>" id="cancel-form">
         <button type="button" id="cancel-btn" class="w-full px-5 py-3 rounded-full border border-danger/60 text-danger hover:bg-danger/10 transition text-sm">
           <i class="fa-solid fa-xmark mr-1"></i> Batalkan Pembayaran

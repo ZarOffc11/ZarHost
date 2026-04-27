@@ -180,11 +180,13 @@ router.get('/checkout/:trxId', async (req, res, next) => {
     if (!trx) return res.redirect('/dashboard');
 
     const qrDataUrl = await payment.renderQR(trx.qr_string);
+    const serverIp = process.env.SERVER_IP || process.env.CLOUDPANEL_HOST || '';
     res.render('pages/payment/checkout', {
       title: 'Pembayaran',
       activeMenu: null,
       trx,
       qrDataUrl,
+      serverIp,
     });
   } catch (err) {
     next(err);
